@@ -5,6 +5,7 @@ import { immer } from "zustand/middleware/immer";
 export type Tenant = {
   landlordId: string;
   propertyId: string;
+  nin: string;
   surname: string;
   otherNames: string;
   contactAddress: string;
@@ -42,6 +43,12 @@ export type Tenant = {
     residential: boolean;
     commercial: boolean;
   };
+  desiredImprovement: string;
+  factorsStimulatingInterest: string;
+  initialRentAccepted: string;
+  petsInfo: string;
+  numberOfVehicles: string;
+  presentResidenceAddress: string;
   bedroomPreference: string;
   rentPaymentFrequency: string;
   personResponsibleForRentPayment: string;
@@ -51,6 +58,7 @@ export type Tenant = {
   reasonForLeavingPresentResidence: string;
   listOfDependents: string[];
   religion: string;
+  otherReligion: string;
   nameAndContactOfPastor: string;
   placeOfWorship: string;
   possessionTiming: {
@@ -60,6 +68,7 @@ export type Tenant = {
   };
   guarantors: Array<{
     name: string;
+    email: string;
     age: number;
     telephone: string;
     address: string;
@@ -76,6 +85,7 @@ export type Tenant = {
 
 export type State = {
   step: number;
+  subStep: number; // 1 or 2 for each section
   tenant: Tenant;
 };
 
@@ -83,6 +93,8 @@ type Actions = {
   actions: {
     goToNextStep: () => void;
     goToPrevStep: () => void;
+    goToNextSubStep: () => void;
+    goToPrevSubStep: () => void;
     resetStore: () => void;
     setTenant: (tenant: Partial<Tenant>) => void;
   };
@@ -90,9 +102,11 @@ type Actions = {
 
 const initState = {
   step: 1,
+  subStep: 1,
   tenant: {
     landlordId: "",
     propertyId: "",
+    nin: "",
     surname: "",
     otherNames: "",
     contactAddress: "",
@@ -130,6 +144,12 @@ const initState = {
       residential: false,
       commercial: false,
     },
+    desiredImprovement: "",
+    factorsStimulatingInterest: "",
+    initialRentAccepted: "",
+    petsInfo: "",
+    numberOfVehicles: "",
+    presentResidenceAddress: "",
     bedroomPreference: "",
     rentPaymentFrequency: "",
     personResponsibleForRentPayment: "",
@@ -139,6 +159,7 @@ const initState = {
     reasonForLeavingPresentResidence: "",
     listOfDependents: [],
     religion: "",
+    otherReligion: "",
     nameAndContactOfPastor: "",
     placeOfWorship: "",
     possessionTiming: {
@@ -149,6 +170,7 @@ const initState = {
     guarantors: [
       {
         name: "",
+        email: "",
         age: 0,
         telephone: "",
         address: "",
@@ -173,6 +195,7 @@ export const useApplicationStore = create<State & Actions>()(
         set((state) => {
           if (state.step < 5) {
             state.step += 1;
+            state.subStep = 1; // Reset sub-step when moving to next section
           }
         });
       },
@@ -180,12 +203,40 @@ export const useApplicationStore = create<State & Actions>()(
         set((state) => {
           if (state.step > 1) {
             state.step -= 1;
+            state.subStep = 2; // Set to last sub-step when going back
+          }
+        });
+      },
+      goToNextSubStep: () => {
+        set((state) => {
+          if (state.subStep < 2) {
+            state.subStep += 1;
+          } else {
+            // If we're at sub-step 2, move to next section
+            if (state.step < 5) {
+              state.step += 1;
+              state.subStep = 1;
+            }
+          }
+        });
+      },
+      goToPrevSubStep: () => {
+        set((state) => {
+          if (state.subStep > 1) {
+            state.subStep -= 1;
+          } else {
+            // If we're at sub-step 1, move to previous section
+            if (state.step > 1) {
+              state.step -= 1;
+              state.subStep = 2;
+            }
           }
         });
       },
       resetStore: () => {
         set((state) => {
           state.step = 1;
+          state.subStep = 1;
           state.tenant = initState.tenant;
         });
       },

@@ -25,17 +25,6 @@ import {
 import { useApplicationStore } from "@/store/application";
 
 const schema = z.object({
-  nin: z.string().min(1, { message: "NIN is required" }),
-  surname: z.string().min(1, { message: "Surname is required" }),
-  otherNames: z.string().min(1, { message: "Other Names are required" }),
-  contactAddress: z.string().min(1, { message: "Contact Address is required" }),
-  nationality: z.string().min(1, { message: "Nationality is required" }),
-  passportNo: z.string(),
-  stateOfOrigin: z.string().min(1, { message: "State of Origin is required" }),
-  localGovernment: z
-    .string()
-    .min(1, { message: "Local Government is required" }),
-  townOfOrigin: z.string().min(1, { message: "Town of Origin is required" }),
   maritalStatus: z.string().min(1, { message: "Marital Status is required" }),
   dateOfBirth: z.string().min(1, { message: "Date of Birth is required" }),
   telephone: z
@@ -63,31 +52,24 @@ const schema = z.object({
     .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
 });
 
-export default function SectionA() {
-  const { goToNextStep, setTenant } = useApplicationStore(
+export default function SectionAPart2() {
+  const { goToNextSubStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
   const { tenant, actions } = useApplicationStore();
+
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
   };
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      nin: tenant.nin,
-      surname: tenant.surname,
-      otherNames: tenant.otherNames,
-      contactAddress: tenant.contactAddress,
-      nationality: tenant.nationality,
-      passportNo: tenant.passportNo,
-      stateOfOrigin: tenant.stateOfOrigin,
-      localGovernment: tenant.localGovernment,
-      townOfOrigin: tenant.townOfOrigin,
       maritalStatus: tenant.maritalStatus,
       dateOfBirth: tenant.dateOfBirth,
       telephone: tenant.telephone,
       personalEmail: tenant.personalEmail,
-      numberOfChildren: 0,
+      numberOfChildren: tenant.numberOfChildren || 0,
       domicileEmail: tenant.domicileEmail,
       profession: tenant.profession,
       position: tenant.position,
@@ -99,234 +81,18 @@ export default function SectionA() {
 
   function onSubmit(values: z.infer<typeof schema>) {
     setTenant(values);
-    goToNextStep();
+    goToNextSubStep();
   }
 
   return (
     <div>
       <h2 className="text-lg font-semibold text-primary lg:text-xl">
-        Section A
+        Section A - Second Part
       </h2>
 
       <Form {...form}>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="nin"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    NIN{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("nin", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="surname"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Surname{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("surname", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="otherNames"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Other Names{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("otherNames", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="contactAddress"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Contact Address{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("contactAddress", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="nationality"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Nationality{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("nationality", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="passportNo"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Passport No. (If Non-Nigerian)
-                    <span className="text-xs text-black"> </span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("passportNo", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="stateOfOrigin"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    State of Origin{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("stateOfOrigin", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="localGovernment"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Local Government{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("localGovernment", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="townOfOrigin"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Town/Village{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("townOfOrigin", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <FormField
               control={form.control}
               name="maritalStatus"

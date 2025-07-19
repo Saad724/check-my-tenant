@@ -23,9 +23,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { useApplicationStore } from "@/store/application";
 
-import SectionA from "./section-a";
-import SectionB from "./section-b";
-import SectionC from "./section-c";
+import SectionAPart1 from "./section-a-part-1";
+import SectionAPart2 from "./section-a-part-2";
+import SectionBPart1 from "./section-b-part-1";
+import SectionBPart2 from "./section-b-part-2";
+import SectionCPart1 from "./section-c-part-1";
+import SectionCPart2 from "./section-c-part-2";
 import SectionD from "./section-d";
 
 type Property = {
@@ -63,21 +66,24 @@ async function getPropertyById(id: string) {
 
 export default function Home() {
   const params = useParams<{ id: string }>();
-  const currentStep = useApplicationStore((state) => state.step);
+  const { step, subStep } = useApplicationStore((state) => ({
+    step: state.step,
+    subStep: state.subStep,
+  }));
 
   const propertyQuery = useQuery({
     queryKey: ["property", params.id],
     queryFn: () => getPropertyById(params.id),
   });
 
-  function renderContent(step: number) {
+  function renderContent(step: number, subStep: number) {
     switch (step) {
       case 1:
-        return <SectionA />;
+        return subStep === 1 ? <SectionAPart1 /> : <SectionAPart2 />;
       case 2:
-        return <SectionB />;
+        return subStep === 1 ? <SectionBPart1 /> : <SectionBPart2 />;
       case 3:
-        return <SectionC />;
+        return subStep === 1 ? <SectionCPart1 /> : <SectionCPart2 />;
       case 4:
         return (
           <SectionD
@@ -88,7 +94,7 @@ export default function Home() {
       case 5:
         return <ApplicationSuccess />;
       default:
-        return <SectionA />;
+        return <SectionAPart1 />;
     }
   }
 
@@ -116,7 +122,7 @@ export default function Home() {
 
         <Stepper />
 
-        {renderContent(currentStep)}
+        {renderContent(step, subStep)}
       </div>
     );
 

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -17,41 +17,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tenant, useApplicationStore } from "@/store/application";
 
 const schema = z.object({
-  guarantors: z.array(
-    z.object({
-      name: z.string().min(1, { message: "Name is required" }),
-      age: z.coerce.number().min(18, { message: "Age must be at least 18" }),
-      telephone: z
-        .string()
-        .min(11, {
-          message: "Mobile Number is required and should be atleast 11 numbers",
-        })
-        .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
-      address: z.string().min(2, { message: "Address is required" }),
-      placeOfWorkAddress: z
-        .string()
-        .min(2, { message: "Place of Work Address is required" }),
-      occupation: z.string().min(2, { message: "Occupation is required" }),
-      positionInCompany: z
-        .string()
-        .min(2, { message: "Position in Company is required" }),
-      maritalStatus: z
-        .string()
-        .min(1, { message: "Marital Status is required" }),
-      signature: z.string().min(1, { message: "Signature is required" }),
-      date: z.string().min(1, { message: "Date is required" }),
-    }),
-  ),
+  guarantors: z
+    .array(
+      z.object({
+        name: z.string().min(1, { message: "Name is required" }),
+        email: z.string().email({ message: "Valid email is required" }),
+      }),
+    )
+    .length(2),
 });
 
 export default function SectionD({
@@ -62,28 +38,21 @@ export default function SectionD({
   propertyId: string;
 }) {
   const tenant = useApplicationStore((store) => store.tenant);
-  const { goToNextStep, goToPrevStep, resetStore, setTenant } =
-    useApplicationStore((store) => store.actions);
-  const handlePrevious = () => {
-    setTenant(form.getValues());
-    goToPrevStep();
-  };
+  const { goToNextSubStep, setTenant } = useApplicationStore(
+    (store) => store.actions,
+  );
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       guarantors: [
         {
-          name: "",
-          age: 0,
-          telephone: "",
-          address: "",
-          placeOfWorkAddress: "",
-          occupation: "",
-          positionInCompany: "",
-          maritalStatus: "",
-          signature: "",
-          date: "",
+          name: tenant.guarantors?.[0]?.name || "",
+          email: tenant.guarantors?.[0]?.email || "",
+        },
+        {
+          name: tenant.guarantors?.[1]?.name || "",
+          email: tenant.guarantors?.[1]?.email || "",
         },
       ],
     },
@@ -103,26 +72,201 @@ export default function SectionD({
       toast.error(error.message);
     },
     onSuccess: () => {
-      goToNextStep();
+      goToNextSubStep();
       toast.success("Application submitted successfully");
     },
   });
 
   function onSubmit(values: z.infer<typeof schema>) {
-    const vals = { ...tenant, ...values };
-    console.log(vals);
-    mutation.mutate({
+    // Add missing fields for both guarantors
+    const updatedGuarantors = values.guarantors.map((guarantor) => ({
+      ...guarantor,
+      age: 0,
+      telephone: "",
+      address: "",
+      placeOfWorkAddress: "",
+      occupation: "",
+      positionInCompany: "",
+      maritalStatus: "",
+      signature: "",
+      date: "",
+    }));
+
+    const finalData = {
       ...tenant,
       landlordId,
       propertyId,
-      ...values,
-    });
+      guarantors: updatedGuarantors,
+    };
+
+    // Comprehensive logging of all form data before API call
+    console.log("=== FINAL APPLICATION DATA ===");
+    console.log("Property ID:", propertyId);
+    console.log("Landlord ID:", landlordId);
+    console.log("Current Step:", useApplicationStore.getState().step);
+    console.log("Current SubStep:", useApplicationStore.getState().subStep);
+
+    console.log("=== SECTION A - PERSONAL INFORMATION ===");
+    console.log("NIN:", tenant.nin);
+    console.log("Surname:", tenant.surname);
+    console.log("Other Names:", tenant.otherNames);
+    console.log("Contact Address:", tenant.contactAddress);
+    console.log("Nationality:", tenant.nationality);
+    console.log("Passport No:", tenant.passportNo);
+    console.log("State of Origin:", tenant.stateOfOrigin);
+    console.log("Local Government:", tenant.localGovernment);
+    console.log("Town of Origin:", tenant.townOfOrigin);
+    console.log("Date of Birth:", tenant.dateOfBirth);
+    console.log("Marital Status:", tenant.maritalStatus);
+    console.log("Number of Children:", tenant.numberOfChildren);
+    console.log("List of Dependents:", tenant.listOfDependents);
+    console.log("Telephone:", tenant.telephone);
+    console.log("Personal Email:", tenant.personalEmail);
+    console.log("Domicile Email:", tenant.domicileEmail);
+    console.log("Profession:", tenant.profession);
+    console.log("Position:", tenant.position);
+    console.log("Office Address:", tenant.officeAddress);
+    console.log("Form of Identification:", tenant.formOfIdentification);
+    console.log("Office Phone:", tenant.officePhone);
+
+    console.log("=== SECTION B - SPOUSE & NEXT OF KIN ===");
+    console.log("Spouse Surname:", tenant.spouse.surname);
+    console.log("Spouse Other Names:", tenant.spouse.otherNames);
+    console.log("Spouse Address:", tenant.spouse.address);
+    console.log("Spouse Telephone:", tenant.spouse.telephone);
+    console.log("Spouse Place of Work:", tenant.spouse.placeOfWork);
+    console.log("Next of Kin Name:", tenant.nextOfKin.name);
+    console.log("Next of Kin Relationship:", tenant.nextOfKin.relationship);
+    console.log("Next of Kin Address:", tenant.nextOfKin.address);
+    console.log("Next of Kin Telephone:", tenant.nextOfKin.telephone);
+    console.log("Next of Kin Place of Work:", tenant.nextOfKin.placeOfWork);
+
+    console.log("=== SECTION C - PROPERTY & RELIGION ===");
+    console.log("Purpose:", tenant.purpose);
+    console.log("Desired Improvement:", tenant.desiredImprovement);
+    console.log(
+      "Factors Stimulating Interest:",
+      tenant.factorsStimulatingInterest,
+    );
+    console.log("Initial Rent Accepted:", tenant.initialRentAccepted);
+    console.log("Pets Info:", tenant.petsInfo);
+    console.log("Number of Vehicles:", tenant.numberOfVehicles);
+    console.log("Present Residence Address:", tenant.presentResidenceAddress);
+    console.log(
+      "Name and Address of Present Landlord:",
+      tenant.nameAndAddressOfPresentLandlord,
+    );
+    console.log(
+      "Reason for Leaving Present Residence:",
+      tenant.reasonForLeavingPresentResidence,
+    );
+    console.log("Number of Occupants:", tenant.numberOfOccupants);
+    console.log("Religion:", tenant.religion);
+    console.log("Other Religion:", tenant.otherReligion);
+    console.log("Place of Worship:", tenant.placeOfWorship);
+    console.log("Possession Timing:", tenant.possessionTiming);
+    console.log("Applicant Signature:", tenant.applicantSignature);
+    console.log("Application Date:", tenant.applicationDate);
+
+    console.log("=== SECTION D - GUARANTORS ===");
+    console.log("Guarantor A - Name:", values.guarantors[0]?.name);
+    console.log("Guarantor A - Email:", values.guarantors[0]?.email);
+    console.log("Guarantor B - Name:", values.guarantors[1]?.name);
+    console.log("Guarantor B - Email:", values.guarantors[1]?.email);
+
+    console.log("=== COMPLETE FINAL DATA ===");
+    console.log(finalData);
+
+    // Check for missing required fields
+    console.log("=== VALIDATION CHECK ===");
+    const missingFields = [];
+
+    if (!tenant.nin) missingFields.push("NIN");
+    if (!tenant.surname) missingFields.push("Surname");
+    if (!tenant.otherNames) missingFields.push("Other Names");
+    if (!tenant.contactAddress) missingFields.push("Contact Address");
+    if (!tenant.nationality) missingFields.push("Nationality");
+    if (!tenant.passportNo) missingFields.push("Passport No");
+    if (!tenant.stateOfOrigin) missingFields.push("State of Origin");
+    if (!tenant.localGovernment) missingFields.push("Local Government");
+    if (!tenant.townOfOrigin) missingFields.push("Town of Origin");
+    if (!tenant.dateOfBirth) missingFields.push("Date of Birth");
+    if (!tenant.maritalStatus) missingFields.push("Marital Status");
+    if (!tenant.telephone) missingFields.push("Telephone");
+    if (!tenant.personalEmail) missingFields.push("Personal Email");
+    if (!tenant.profession) missingFields.push("Profession");
+    if (!tenant.position) missingFields.push("Position");
+    if (!tenant.officeAddress) missingFields.push("Office Address");
+    if (!tenant.formOfIdentification)
+      missingFields.push("Form of Identification");
+    if (!tenant.officePhone) missingFields.push("Office Phone");
+
+    // Check spouse fields
+    if (!tenant.spouse.surname) missingFields.push("Spouse Surname");
+    if (!tenant.spouse.otherNames) missingFields.push("Spouse Other Names");
+    if (!tenant.spouse.address) missingFields.push("Spouse Address");
+    if (!tenant.spouse.telephone) missingFields.push("Spouse Telephone");
+    if (!tenant.spouse.placeOfWork) missingFields.push("Spouse Place of Work");
+
+    // Check next of kin fields
+    if (!tenant.nextOfKin.name) missingFields.push("Next of Kin Name");
+    if (!tenant.nextOfKin.relationship)
+      missingFields.push("Next of Kin Relationship");
+    if (!tenant.nextOfKin.address) missingFields.push("Next of Kin Address");
+    if (!tenant.nextOfKin.telephone)
+      missingFields.push("Next of Kin Telephone");
+    if (!tenant.nextOfKin.placeOfWork)
+      missingFields.push("Next of Kin Place of Work");
+
+    // Check Section C fields
+    if (!tenant.purpose.residential && !tenant.purpose.commercial)
+      missingFields.push("Purpose");
+    if (!tenant.desiredImprovement) missingFields.push("Desired Improvement");
+    if (!tenant.factorsStimulatingInterest)
+      missingFields.push("Factors Stimulating Interest");
+    if (!tenant.initialRentAccepted)
+      missingFields.push("Initial Rent Accepted");
+    if (!tenant.petsInfo) missingFields.push("Pets Info");
+    if (!tenant.numberOfVehicles) missingFields.push("Number of Vehicles");
+    if (!tenant.presentResidenceAddress)
+      missingFields.push("Present Residence Address");
+    if (!tenant.nameAndAddressOfPresentLandlord)
+      missingFields.push("Name and Address of Present Landlord");
+    if (!tenant.reasonForLeavingPresentResidence)
+      missingFields.push("Reason for Leaving Present Residence");
+    if (!tenant.numberOfOccupants) missingFields.push("Number of Occupants");
+    if (!tenant.religion) missingFields.push("Religion");
+    if (!tenant.placeOfWorship) missingFields.push("Place of Worship");
+    if (
+      !tenant.possessionTiming.immediately &&
+      !tenant.possessionTiming.oneMonth &&
+      !tenant.possessionTiming.threeMonths
+    )
+      missingFields.push("Possession Timing");
+    if (!tenant.applicantSignature) missingFields.push("Applicant Signature");
+    if (!tenant.applicationDate) missingFields.push("Application Date");
+
+    // Check guarantor fields
+    if (!values.guarantors[0]?.name) missingFields.push("Guarantor A Name");
+    if (!values.guarantors[0]?.email) missingFields.push("Guarantor A Email");
+    if (!values.guarantors[1]?.name) missingFields.push("Guarantor B Name");
+    if (!values.guarantors[1]?.email) missingFields.push("Guarantor B Email");
+
+    if (missingFields.length > 0) {
+      console.warn("⚠️ MISSING REQUIRED FIELDS:", missingFields);
+    } else {
+      console.log("✅ ALL REQUIRED FIELDS ARE FILLED");
+    }
+
+    console.log("=== END OF APPLICATION DATA ===");
+
+    mutation.mutate(finalData);
   }
 
   return (
     <div>
       <h2 className="text-lg font-semibold text-primary lg:text-xl">
-        Section D
+        Section D - Guarantors
       </h2>
 
       <Form {...form}>
@@ -132,318 +276,113 @@ export default function SectionD({
               Guarantors
             </h3>
             <p className="text-sm">
-              (Please give names and addresses of 2 persons; who shall be
-              required to provide a letter of guarantee/recommendation on letter
-              headed paper).
+              (Please give names and emails of 2 persons; who shall be required
+              to provide a letter of guarantee/recommendation on letter headed
+              paper).
             </p>
           </div>
 
-          <div>
-            <h4 className="my-6 text-sm font-semibold uppercase text-black">
-              Guarantor A
-            </h4>
+          <div className="space-y-8">
+            {/* Guarantor A */}
+            <div>
+              <h4 className="my-6 text-sm font-semibold uppercase text-black">
+                Guarantor A
+              </h4>
 
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name={`guarantors.0.name`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name={`guarantors.0.name`}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>
+                        Name{"  "}
+                        <span className="text-xs text-black">(Required*)</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input className="w-full" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name={`guarantors.0.age`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Age</FormLabel>
-                    <FormControl>
-                      <Input type="number" className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name={`guarantors.0.email`}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>
+                        Email{"  "}
+                        <span className="text-xs text-black">(Required*)</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="email" className="w-full" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
 
-              <FormField
-                control={form.control}
-                name={`guarantors.0.telephone`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Telephone</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* Guarantor B */}
+            <div>
+              <h4 className="my-6 text-sm font-semibold uppercase text-black">
+                Guarantor B
+              </h4>
 
-              <FormField
-                control={form.control}
-                name={`guarantors.0.address`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name={`guarantors.1.name`}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>
+                        Name{"  "}
+                        <span className="text-xs text-black">(Required*)</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input className="w-full" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name={`guarantors.0.placeOfWorkAddress`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Place of Work Address</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.0.occupation`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Occupation</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.0.positionInCompany`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Position in Company</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.0.maritalStatus`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Marital Status</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`guarantors.0.signature`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Signature (Your Government Name)</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.0.date`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name={`guarantors.1.email`}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>
+                        Email{"  "}
+                        <span className="text-xs text-black">(Required*)</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="email" className="w-full" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
           </div>
 
-          <div>
-            <h4 className="my-6 text-sm font-semibold uppercase text-black">
-              Guarantor B
-            </h4>
-
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name={`guarantors.1.name`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.1.age`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Age</FormLabel>
-                    <FormControl>
-                      <Input type="number" className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.1.telephone`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Telephone</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.1.address`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.1.placeOfWorkAddress`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Place of Work Address</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.1.occupation`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Occupation</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.1.positionInCompany`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Position in Company</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.1.maritalStatus`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Marital Status</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.1.signature`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Signature</FormLabel>
-                    <FormControl>
-                      <Input className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`guarantors.1.date`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" className="w-full" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="mt-5 flex items-center justify-between gap-4">
-            <Button className="w-full" type="button" onClick={handlePrevious}>
-              <ChevronLeft />
-              Section C
-            </Button>
-
-            <Button className="w-full" type="submit">
+          <div className="my-5">
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={mutation.isPending}
+            >
               {mutation.isPending ? (
                 <div className="h-4 w-4 animate-spinner rounded-full border-2 border-t-2 border-t-primary ease-linear"></div>
-              ) : null}
-              Submit <ChevronRight />
+              ) : (
+                <>
+                  Submit <ChevronRight />
+                </>
+              )}
             </Button>
           </div>
         </form>
