@@ -336,33 +336,16 @@ export default function SectionA() {
                     Marital Status{" "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      handleFieldChange("maritalStatus", value);
-                    }}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition duration-150 ease-in-out focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary">
-                        <SelectValue placeholder="Select Status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="rounded-md border border-gray-300 bg-white shadow-lg">
-                      <SelectItem
-                        value="Married"
-                        className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                      >
-                        Married
-                      </SelectItem>
-                      <SelectItem
-                        value="Single"
-                        className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                      >
-                        Single
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input
+                      className="w-full"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleFieldChange("maritalStatus", e.target.value);
+                      }}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

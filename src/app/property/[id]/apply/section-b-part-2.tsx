@@ -19,7 +19,7 @@ import { useApplicationStore } from "@/store/application";
 
 const schema = z.object({
   nextOfKin: z.object({
-    name: z.string().min(1, { message: "Name is required" }),
+    surname: z.string().min(1, { message: "Surname is required" }),
     address: z.string().min(2, { message: "Address is required" }),
     telephone: z
       .string()
@@ -46,7 +46,7 @@ export default function SectionBPart2() {
     resolver: zodResolver(schema),
     defaultValues: {
       nextOfKin: {
-        name: tenant.nextOfKin.name,
+        surname: tenant.nextOfKin.surname,
         address: tenant.nextOfKin.address,
         telephone: tenant.nextOfKin.telephone,
         relationship: tenant.nextOfKin.relationship,
@@ -63,7 +63,7 @@ export default function SectionBPart2() {
   return (
     <div>
       <h2 className="text-lg font-semibold text-primary lg:text-xl">
-        Section B - Second Part
+        Section B
       </h2>
 
       <Form {...form}>
@@ -77,11 +77,11 @@ export default function SectionBPart2() {
               <div className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="nextOfKin.name"
+                  name="nextOfKin.surname"
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel>
-                        Name{"  "}
+                        Surname{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
                       <FormControl>
@@ -90,7 +90,10 @@ export default function SectionBPart2() {
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
-                            handleFieldChange("nextOfKin.name", e.target.value);
+                            handleFieldChange(
+                              "nextOfKin.surname",
+                              e.target.value,
+                            );
                           }}
                         />
                       </FormControl>

@@ -94,7 +94,7 @@ export default function SectionCPart1() {
   return (
     <div>
       <h2 className="text-lg font-semibold text-primary lg:text-xl">
-        Section C - First Part
+        Section C
       </h2>
 
       <Form {...form}>

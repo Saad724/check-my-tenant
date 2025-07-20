@@ -80,7 +80,7 @@ export default function SectionCPart2() {
   return (
     <div>
       <h2 className="text-lg font-semibold text-primary lg:text-xl">
-        Section C - Second Part
+        Section C
       </h2>
 
       <Form {...form}>

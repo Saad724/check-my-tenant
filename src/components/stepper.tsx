@@ -89,9 +89,7 @@ export function Stepper() {
       {/* Sub-step indicator */}
       {step < 5 && (
         <div className="mt-2 flex justify-center text-xs text-gray-600">
-          <span>
-            {getStepLabel(step)} - Part {subStep}
-          </span>
+          <span>{/* {getStepLabel(step)} - Part {subStep} */}</span>
         </div>
       )}
     </div>

@@ -37,19 +37,16 @@ const schema = z.object({
   numberOfChildren: z.coerce
     .number()
     .min(0, { message: "Number of Children must be a non-negative number" }),
-  domicileEmail: z.string().email({ message: "Invalid email address" }),
   profession: z.string().min(1, { message: "Profession is required" }),
   position: z.string().min(1, { message: "Role is required" }),
   officeAddress: z.string().min(1, { message: "Office Address is required" }),
   formOfIdentification: z
     .string()
     .min(1, { message: "Form of Identification is required" }),
-  officePhone: z
+  officeEmail: z
     .string()
-    .min(11, {
-      message: "Mobile Number is required and should be atleast 11 numbers",
-    })
-    .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
+    .email({ message: "Invalid email address" })
+    .optional(),
 });
 
 export default function SectionAPart2() {
@@ -70,12 +67,11 @@ export default function SectionAPart2() {
       telephone: tenant.telephone,
       personalEmail: tenant.personalEmail,
       numberOfChildren: tenant.numberOfChildren || 0,
-      domicileEmail: tenant.domicileEmail,
       profession: tenant.profession,
       position: tenant.position,
       officeAddress: tenant.officeAddress,
       formOfIdentification: tenant.formOfIdentification,
-      officePhone: tenant.officePhone,
+      officeEmail: tenant.officeEmail,
     },
   });
 
@@ -87,7 +83,7 @@ export default function SectionAPart2() {
   return (
     <div>
       <h2 className="text-lg font-semibold text-primary lg:text-xl">
-        Section A - Second Part
+        Section A
       </h2>
 
       <Form {...form}>
@@ -102,33 +98,16 @@ export default function SectionAPart2() {
                     Marital Status{" "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      handleFieldChange("maritalStatus", value);
-                    }}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition duration-150 ease-in-out focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary">
-                        <SelectValue placeholder="Select Status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="rounded-md border border-gray-300 bg-white shadow-lg">
-                      <SelectItem
-                        value="Married"
-                        className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                      >
-                        Married
-                      </SelectItem>
-                      <SelectItem
-                        value="Single"
-                        className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                      >
-                        Single
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input
+                      className="w-full"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleFieldChange("maritalStatus", e.target.value);
+                      }}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -235,30 +214,6 @@ export default function SectionAPart2() {
 
             <FormField
               control={form.control}
-              name="domicileEmail"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Domicile Email{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("domicileEmail", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="profession"
               render={({ field }) => (
                 <FormItem className="w-full">
@@ -331,30 +286,6 @@ export default function SectionAPart2() {
 
             <FormField
               control={form.control}
-              name="officePhone"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Office Phone{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("officePhone", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="formOfIdentification"
               render={({ field }) => (
                 <FormItem className="w-full">
@@ -372,6 +303,29 @@ export default function SectionAPart2() {
                           "formOfIdentification",
                           e.target.value,
                         );
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="officeEmail"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>
+                    Office Email{"  "}
+                    <span className="text-xs text-black">(Optional*)</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="w-full"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleFieldChange("officeEmail", e.target.value);
                       }}
                     />
                   </FormControl>

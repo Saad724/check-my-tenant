@@ -20,7 +20,6 @@ import { useApplicationStore } from "@/store/application";
 const schema = z.object({
   spouse: z.object({
     surname: z.string().min(1, { message: "Surname is required" }),
-    otherNames: z.string().min(1, { message: "Other Names is required" }),
     address: z.string().min(1, { message: "Address is required" }),
     telephone: z
       .string()
@@ -28,6 +27,7 @@ const schema = z.object({
         message: "Mobile Number is required and should be atleast 11 numbers",
       })
       .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
+    relationship: z.string().min(1, { message: "Relationship is required" }),
     placeOfWork: z.string().min(2, { message: "Place of Work is required" }),
   }),
 });
@@ -47,9 +47,9 @@ export default function SectionBPart1() {
     defaultValues: {
       spouse: {
         surname: tenant.spouse.surname,
-        otherNames: tenant.spouse.otherNames,
         address: tenant.spouse.address,
         telephone: tenant.spouse.telephone,
+        relationship: tenant.spouse.relationship,
         placeOfWork: tenant.spouse.placeOfWork,
       },
     },
@@ -63,7 +63,7 @@ export default function SectionBPart1() {
   return (
     <div>
       <h2 className="text-lg font-semibold text-primary lg:text-xl">
-        Section B - First Part
+        Section B
       </h2>
 
       <Form {...form}>
@@ -89,33 +89,6 @@ export default function SectionBPart1() {
                           onChange={(e) => {
                             field.onChange(e);
                             handleFieldChange("spouse.surname", e.target.value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="spouse.otherNames"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>
-                        Other Names{"  "}
-                        <span className="text-xs text-black">(Required*)</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="w-full"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            handleFieldChange(
-                              "spouse.otherNames",
-                              e.target.value,
-                            );
                           }}
                         />
                       </FormControl>
@@ -164,6 +137,32 @@ export default function SectionBPart1() {
                             field.onChange(e);
                             handleFieldChange(
                               "spouse.telephone",
+                              e.target.value,
+                            );
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="spouse.relationship"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Relationship{"  "}
+                        <span className="text-xs text-black">(Required*)</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleFieldChange(
+                              "spouse.relationship",
                               e.target.value,
                             );
                           }}

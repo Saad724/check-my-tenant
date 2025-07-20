@@ -124,11 +124,11 @@ export default function Home() {
             </p>
           </div>
 
-          <Link href="/guarantor/signin">
+          {/* <Link href="/guarantor/signin">
             <Button className="bg-teal-600 text-white hover:bg-teal-700">
               Guarantor Sign In
             </Button>
-          </Link>
+          </Link> */}
         </div>
 
         <Stepper />

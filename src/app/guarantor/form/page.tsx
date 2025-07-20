@@ -598,7 +598,7 @@ function Step4Form({
 
       {/* Undertaking Form */}
       <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 lg:p-8">
-        <h3 className="mb-6 text-center text-lg font-bold uppercase lg:text-xl">
+        <h3 className="undertaking-title mb-6 text-center uppercase">
           Undertaking from a Guarantor
         </h3>
 
