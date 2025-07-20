@@ -89,3 +89,49 @@
   line-height: 140%;
   letter-spacing: -2%;
 }
+
+/* Guarantor Form Styles */
+.guarantor-primary {
+  background-color: #00a69a !important;
+  color: #fff !important;
+  border: none !important;
+}
+.guarantor-h2 {
+  color: #00a69a !important;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+.guarantor-main-heading {
+  color: #222222 !important;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.75rem;
+}
+.guarantor-section-heading {
+  color: #222222 !important;
+  font-family: Inter;
+  font-weight: 600;
+  font-style: Semi Bold;
+  font-size: 24px;
+  line-height: 140%;
+  letter-spacing: -2%;
+}
+.guarantor-subheading {
+  color: #979696 !important;
+  font-family: Inter;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: -2%;
+}
+.guarantor-label {
+  color: #979696 !important;
+  font-family: Inter;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -2%;
+}

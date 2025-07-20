@@ -245,11 +245,11 @@ export default function GuarantorForm() {
     <div className="mx-auto w-full max-w-3xl p-4 lg:p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-xl font-bold leading-tight text-gray-900">
+        <h1 className="guarantor-main-heading text-xl font-bold leading-tight">
           Dwight Schrute has named you as a Guarantor for his apartment rental
           application
         </h1>
-        <p className="mt-4 text-base leading-relaxed text-gray-600">
+        <p className="guarantor-subheading mt-4">
           As a Guarantor, you are responsible for Dwight Schrute's apartment
           rental obligations
         </p>
@@ -257,7 +257,7 @@ export default function GuarantorForm() {
 
       {/* Stepper */}
       <div className="mb-8">
-        <GuarantorStepper currentStep={step} totalSteps={4} />
+        {/* <GuarantorStepper currentStep={step} totalSteps={4} /> */}
       </div>
 
       {/* Form Content */}
@@ -276,7 +276,7 @@ function Step1Form({
 }) {
   return (
     <div>
-      <h2 className="mb-6 text-lg font-semibold text-primary lg:text-xl">
+      <h2 className="guarantor-h2 guarantor-section-heading mb-6 text-lg font-semibold text-primary lg:text-xl">
         Personal Contact Information
       </h2>
 
@@ -287,10 +287,7 @@ function Step1Form({
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Full name{" "}
-                  <span className="text-xs text-black">(Required*)</span>
-                </FormLabel>
+                <FormLabel className="guarantor-label">Full name </FormLabel>
                 <FormControl>
                   <Input placeholder="Your name" {...field} />
                 </FormControl>
@@ -304,9 +301,8 @@ function Step1Form({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel className="guarantor-label">
                   Email address{" "}
-                  <span className="text-xs text-black">(Required*)</span>
                 </FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="Your email" {...field} />
@@ -321,10 +317,7 @@ function Step1Form({
             name="phoneNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Phone number{" "}
-                  <span className="text-xs text-black">(Required*)</span>
-                </FormLabel>
+                <FormLabel className="guarantor-label">Phone number </FormLabel>
                 <FormControl>
                   <Input placeholder="Your phone number" {...field} />
                 </FormControl>
@@ -338,10 +331,7 @@ function Step1Form({
             name="homeAddress"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Home address{" "}
-                  <span className="text-xs text-black">(Required*)</span>
-                </FormLabel>
+                <FormLabel className="guarantor-label">Home address </FormLabel>
                 <FormControl>
                   <Input placeholder="Your home address" {...field} />
                 </FormControl>
@@ -351,10 +341,7 @@ function Step1Form({
           />
 
           <div className="pt-4">
-            <Button
-              type="submit"
-              className="w-full bg-teal-600 text-white hover:bg-teal-700"
-            >
+            <Button type="submit" className="guarantor-primary w-full">
               Save & go to next <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -374,7 +361,7 @@ function Step2Form({
 }) {
   return (
     <div>
-      <h2 className="mb-6 text-lg font-semibold text-primary lg:text-xl">
+      <h2 className="guarantor-h2 guarantor-section-heading mb-6 text-lg font-semibold text-primary lg:text-xl">
         Location Information
       </h2>
 
@@ -385,9 +372,8 @@ function Step2Form({
             name="stateOfOrigin"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel className="guarantor-label">
                   State of Origin{" "}
-                  <span className="text-xs text-black">(Required*)</span>
                 </FormLabel>
                 <FormControl>
                   <Input placeholder="Your state of origin" {...field} />
@@ -402,10 +388,7 @@ function Step2Form({
             name="cityTown"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  City/Town{" "}
-                  <span className="text-xs text-black">(Required*)</span>
-                </FormLabel>
+                <FormLabel className="guarantor-label">City/Town </FormLabel>
                 <FormControl>
                   <Input placeholder="Your city or town" {...field} />
                 </FormControl>
@@ -419,9 +402,7 @@ function Step2Form({
             name="lga"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  L.G.A <span className="text-xs text-black">(Required*)</span>
-                </FormLabel>
+                <FormLabel className="guarantor-label">L.G.A</FormLabel>
                 <FormControl>
                   <Input placeholder="Your Local Government Area" {...field} />
                 </FormControl>
@@ -435,9 +416,8 @@ function Step2Form({
             name="officeAddress"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel className="guarantor-label">
                   Office Address{" "}
-                  <span className="text-xs text-black">(Required*)</span>
                 </FormLabel>
                 <FormControl>
                   <Input placeholder="Your office address" {...field} />
@@ -448,10 +428,7 @@ function Step2Form({
           />
 
           <div className="pt-4">
-            <Button
-              type="submit"
-              className="w-full bg-teal-600 text-white hover:bg-teal-700"
-            >
+            <Button type="submit" className="guarantor-primary w-full">
               Save & go to next <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -481,7 +458,7 @@ function Step3Form({
 
   return (
     <div>
-      <h2 className="mb-6 text-lg font-semibold text-primary lg:text-xl">
+      <h2 className="guarantor-h2 guarantor-section-heading mb-6 text-lg font-semibold text-primary lg:text-xl">
         Signature & Documentation
       </h2>
 
@@ -492,9 +469,8 @@ function Step3Form({
             name="signature"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel className="guarantor-label">
                   Signature/Initials{" "}
-                  <span className="text-xs text-black">(Required*)</span>
                 </FormLabel>
                 <FormControl>
                   <Input placeholder="Your name" {...field} />
@@ -509,9 +485,7 @@ function Step3Form({
             name="date"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Date <span className="text-xs text-black">(Required*)</span>
-                </FormLabel>
+                <FormLabel className="guarantor-label">Date</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} />
                 </FormControl>
@@ -522,10 +496,7 @@ function Step3Form({
 
           {/* Passport Upload Section */}
           <div className="space-y-4">
-            <FormLabel>
-              Passport Upload{" "}
-              <span className="text-xs text-black">(Required*)</span>
-            </FormLabel>
+            <FormLabel className="guarantor-label">Passport Upload </FormLabel>
 
             <div className="rounded-lg border-2 border-dashed border-teal-200 p-6 text-center">
               <input
@@ -557,10 +528,7 @@ function Step3Form({
           </div>
 
           <div className="pt-4">
-            <Button
-              type="submit"
-              className="w-full bg-teal-600 text-white hover:bg-teal-700"
-            >
+            <Button type="submit" className="guarantor-primary w-full">
               Save & go to next <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -582,7 +550,7 @@ function Step4Form({
 }) {
   return (
     <div className="mx-auto max-w-4xl">
-      <h2 className="mb-6 text-lg font-semibold text-primary lg:text-xl">
+      <h2 className="guarantor-h2 guarantor-section-heading mb-6 text-lg font-semibold text-primary lg:text-xl">
         Guarantee Undertaking
       </h2>
 
@@ -707,10 +675,7 @@ function Step4Form({
           />
 
           <div className="pt-4">
-            <Button
-              type="submit"
-              className="w-full bg-teal-600 text-white hover:bg-teal-700"
-            >
+            <Button type="submit" className="guarantor-primary w-full">
               Submit <Check className="ml-2 h-4 w-4" />
             </Button>
           </div>
