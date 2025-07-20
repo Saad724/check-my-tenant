@@ -2,7 +2,9 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { apiRequest } from "@/lib/utils";
 import { useApplicationStore } from "@/store/application";
 
 const schema = z.object({
@@ -29,6 +32,7 @@ const schema = z.object({
     .string()
     .min(1, { message: "Local Government is required" }),
   townOfOrigin: z.string().min(1, { message: "Town of Origin is required" }),
+  email: z.string().email({ message: "Email is required" }),
 });
 
 export default function SectionAPart1() {
@@ -53,12 +57,24 @@ export default function SectionAPart1() {
       stateOfOrigin: tenant.stateOfOrigin,
       localGovernment: tenant.localGovernment,
       townOfOrigin: tenant.townOfOrigin,
+      email: tenant.email,
     },
   });
 
-  function onSubmit(values: z.infer<typeof schema>) {
-    setTenant(values);
-    goToNextSubStep();
+  async function onSubmit(values: z.infer<typeof schema>) {
+    try {
+      const nin = values.nin;
+      const name = `${values.surname} ${values.otherNames}`;
+      const email = values.email;
+      await apiRequest("/api/accounts/verify-guest-identity", {
+        method: "POST",
+        body: JSON.stringify({ nin, name, email }),
+      });
+      setTenant(values);
+      goToNextSubStep();
+    } catch (e: any) {
+      toast.error(e.message || "NIN verification failed.");
+    }
   }
 
   return (
@@ -278,6 +294,31 @@ export default function SectionAPart1() {
                       onChange={(e) => {
                         field.onChange(e);
                         handleFieldChange("townOfOrigin", e.target.value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>
+                    Email{"  "}
+                    <span className="text-xs text-black">(Required*)</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="w-full"
+                      type="email"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleFieldChange("email", e.target.value);
                       }}
                     />
                   </FormControl>

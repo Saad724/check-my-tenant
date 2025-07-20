@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
 export type Tenant = {
+  email: string | undefined;
   landlordId: string;
   propertyId: string;
   nin: string;

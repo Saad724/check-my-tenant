@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -22,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { apiRequest } from "@/lib/utils";
 import { useApplicationStore } from "@/store/application";
 
 const schema = z.object({
@@ -102,6 +104,35 @@ export default function SectionA() {
     goToNextStep();
   }
 
+  const [ninStatus, setNinStatus] = useState<null | {
+    success: boolean;
+    message: string;
+  }>(null);
+  const [verifyingNin, setVerifyingNin] = useState(false);
+
+  async function handleVerifyNIN() {
+    setVerifyingNin(true);
+    setNinStatus(null);
+    try {
+      const nin = form.getValues("nin");
+      const name = `${form.getValues("surname")} ${form.getValues("otherNames")}`;
+      const email = form.getValues("personalEmail");
+      const phone = form.getValues("telephone");
+      const res = await apiRequest("/api/accounts/verify-guest-identity", {
+        method: "POST",
+        body: JSON.stringify({ nin, name, email, phone }),
+      });
+      setNinStatus({ success: true, message: "NIN verified successfully." });
+    } catch (e: any) {
+      setNinStatus({
+        success: false,
+        message: e.message || "NIN verification failed.",
+      });
+    } finally {
+      setVerifyingNin(false);
+    }
+  }
+
   return (
     <div>
       <h2 className="text-lg font-semibold text-primary lg:text-xl">
@@ -120,16 +151,33 @@ export default function SectionA() {
                     NIN{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("nin", e.target.value);
-                      }}
-                    />
-                  </FormControl>
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Input
+                        className="w-full"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handleFieldChange("nin", e.target.value);
+                        }}
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      onClick={handleVerifyNIN}
+                      disabled={verifyingNin || !form.getValues("nin")}
+                      className="shrink-0"
+                    >
+                      {verifyingNin ? "Verifying..." : "Verify NIN"}
+                    </Button>
+                  </div>
+                  {ninStatus && (
+                    <div
+                      className={`mt-1 text-sm ${ninStatus.success ? "text-green-600" : "text-red-600"}`}
+                    >
+                      {ninStatus.message}
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}

@@ -71,7 +71,7 @@ export default function SectionD() {
   const mutation = useMutation({
     mutationFn: async (data: Tenant) => {
       await fetch(
-        "https://check-my-tenant.vercel.app/api/tenants/tenant-application",
+        "http://check-my-tenant.vercel.app/api/tenants/tenant-application",
         {
           method: "POST",
           body: JSON.stringify(data),

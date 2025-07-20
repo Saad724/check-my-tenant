@@ -61,7 +61,7 @@ export default function SectionD({
   const mutation = useMutation({
     mutationFn: async (data: Tenant) => {
       await fetch(
-        "https://check-my-tenant.vercel.app/api/tenants/tenant-application",
+        "http://check-my-tenant.vercel.app/api/tenants/tenant-application",
         {
           method: "POST",
           body: JSON.stringify(data),
@@ -96,6 +96,7 @@ export default function SectionD({
       ...tenant,
       landlordId,
       propertyId,
+      applicationId: "67f179e0f06e8a946c27581b",
       guarantors: updatedGuarantors,
     };
 

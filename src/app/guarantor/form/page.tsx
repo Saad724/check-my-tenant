@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { apiRequest } from "@/lib/utils";
 
 // Schema for the first step
 const step1Schema = z.object({
@@ -213,11 +214,36 @@ export default function GuarantorForm() {
   }
 
   function onSubmitStep4(values: Step4Data) {
+    const id = "684b85593bffa0dced970cce"; // Replace with dynamic id if available
     setGuarantorData((prev) => ({ ...prev, ...values }));
-    console.log("Final guarantor data:", guarantorData);
-    console.log("Step 4 data:", values);
-    // Here you would typically submit to API
-    alert("Guarantor form submitted successfully!");
+    const payload = {
+      fullName: guarantorData.fullName,
+      emailAddress: guarantorData.email,
+      NIN: "12345678901", // Add NIN if available in your form
+      phoneNumber: guarantorData.phoneNumber,
+      homeAddress: guarantorData.homeAddress,
+      stateOfOrigin: guarantorData.stateOfOrigin,
+      cityTown: guarantorData.cityTown,
+      LGA: guarantorData.lga,
+      officeAddress: guarantorData.officeAddress,
+      placeOfWork: "", // Add if available
+      occupation: "", // Add if available
+      positionInCompany: "", // Add if available
+      maritalStatus: "", // Add if available
+      signature: guarantorData.signature,
+      date: guarantorData.date,
+      passport: "", // Add if available
+    };
+    apiRequest(`/api/tenants/update-guarantor?id=${id}`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    })
+      .then(() => {
+        alert("Guarantor form submitted successfully!");
+      })
+      .catch((e) => {
+        alert("Failed to submit guarantor form: " + e.message);
+      });
   }
 
   function renderContent(step: number) {

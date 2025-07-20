@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { apiRequest } from "@/lib/utils";
 import { Tenant, useApplicationStore } from "@/store/application";
 
 const schema = z.object({
@@ -83,20 +84,21 @@ export default function SectionDPart2({
 
   const mutation = useMutation({
     mutationFn: async (data: Tenant) => {
-      await fetch(
-        "https://check-my-tenant.vercel.app/api/tenants/tenant-application",
-        {
-          method: "POST",
-          body: JSON.stringify(data),
-        },
-      );
+      const response = await apiRequest("/api/tenants/tenant-application", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      if (response && response.message && response.status === "error") {
+        throw new Error(response.message);
+      }
+      return response;
     },
-    onError: (error) => {
-      toast.error(error.message);
+    onError: (error: any) => {
+      toast.error(error.message || "Application submission failed");
     },
-    onSuccess: () => {
-      goToNextSubStep();
+    onSuccess: (data) => {
       toast.success("Application submitted successfully");
+      goToNextSubStep();
     },
   });
 
@@ -134,6 +136,7 @@ export default function SectionDPart2({
       ...tenant,
       landlordId,
       propertyId,
+      applicationId: "67f179e0f06e8a946c27581b",
       guarantors: updatedGuarantors,
     };
 
