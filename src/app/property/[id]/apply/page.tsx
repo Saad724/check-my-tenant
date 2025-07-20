@@ -104,21 +104,32 @@ export default function Home() {
   if (propertyQuery.data)
     return (
       <div className="mx-auto w-full max-w-3xl p-4 lg:p-8">
-        <h1 className="text-2xl font-semibold text-black lg:text-3xl">
-          Application form for {propertyQuery.data.property.propertyTitle}
-        </h1>
+        {/* Header with Guarantor Button */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-black lg:text-3xl">
+              Application form for {propertyQuery.data.property.propertyTitle}
+            </h1>
 
-        <p className="mt-4">
-          Created:{" "}
-          <span className="text-black">
-            {formatDistanceToNow(
-              new Date(propertyQuery.data.property.created),
-              {
-                addSuffix: true,
-              },
-            )}
-          </span>
-        </p>
+            <p className="mt-4">
+              Created:{" "}
+              <span className="text-black">
+                {formatDistanceToNow(
+                  new Date(propertyQuery.data.property.created),
+                  {
+                    addSuffix: true,
+                  },
+                )}
+              </span>
+            </p>
+          </div>
+
+          <Link href="/guarantor/signin">
+            <Button className="bg-teal-600 text-white hover:bg-teal-700">
+              Guarantor Sign In
+            </Button>
+          </Link>
+        </div>
 
         <Stepper />
 
