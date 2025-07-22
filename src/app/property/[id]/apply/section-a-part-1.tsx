@@ -73,11 +73,11 @@ export default function SectionAPart1() {
       const nin = values.nin;
       const name = `${values.surname} ${values.otherNames}`;
       const email = values.email;
-      // await apiRequest("/api/accounts/verify-guest-identity", {
-      //   method: "POST",
-      //   body: JSON.stringify({ nin, name, email, phone: values.telephone }),
-      // });
-      // toast.success("NIN verified successfully!");
+      await apiRequest("/api/accounts/verify-guest-identity", {
+        method: "POST",
+        body: JSON.stringify({ nin, name, email, phone: values.telephone }),
+      });
+      toast.success("NIN verified successfully!");
       setTenant(values);
       goToNextSubStep();
     } catch (e: any) {
