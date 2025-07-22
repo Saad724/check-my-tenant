@@ -62,11 +62,7 @@ export type Tenant = {
   otherReligion: string;
   nameAndContactOfPastor: string;
   placeOfWorship: string;
-  possessionTiming: {
-    immediately: boolean;
-    oneMonth: boolean;
-    threeMonths: boolean;
-  };
+  possessionTiming: string;
   guarantors: Array<{
     name: string;
     email: string;
@@ -98,6 +94,7 @@ type Actions = {
     goToPrevSubStep: () => void;
     resetStore: () => void;
     setTenant: (tenant: Partial<Tenant>) => void;
+    goToFinish: () => void;
   };
 };
 
@@ -105,6 +102,7 @@ const initState = {
   step: 1,
   subStep: 1,
   tenant: {
+    email: undefined,
     landlordId: "",
     propertyId: "",
     nin: "",
@@ -163,11 +161,7 @@ const initState = {
     otherReligion: "",
     nameAndContactOfPastor: "",
     placeOfWorship: "",
-    possessionTiming: {
-      immediately: false,
-      oneMonth: false,
-      threeMonths: false,
-    },
+    possessionTiming: "",
     guarantors: [
       {
         name: "",
@@ -219,6 +213,12 @@ export const useApplicationStore = create<State & Actions>()(
               state.subStep = 1;
             }
           }
+        });
+      },
+      goToFinish: () => {
+        set((state) => {
+          state.step = 5;
+          state.subStep = 1;
         });
       },
       goToPrevSubStep: () => {

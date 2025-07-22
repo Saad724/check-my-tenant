@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -19,24 +19,19 @@ import { useApplicationStore } from "@/store/application";
 
 const schema = z.object({
   nextOfKin: z.object({
-    surname: z.string().min(1, { message: "Surname is required" }),
-    address: z.string().min(2, { message: "Address is required" }),
-    telephone: z
-      .string()
-      .min(11, {
-        message: "Mobile Number is required and should be atleast 11 numbers",
-      })
-      .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
+    name: z.string().min(1, { message: "Name is required" }),
+    address: z.string().min(1, { message: "Address is required" }),
+    telephone: z.string().min(1, { message: "Telephone is required" }),
     relationship: z.string().min(1, { message: "Relationship is required" }),
     placeOfWork: z.string().min(1, { message: "Place of Work is required" }),
   }),
 });
 
 export default function SectionBPart2() {
-  const { goToNextSubStep, setTenant } = useApplicationStore(
+  const { goToNextSubStep, goToPrevSubStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
-  const { tenant, actions } = useApplicationStore();
+  const { tenant, actions, step, subStep } = useApplicationStore();
 
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
@@ -46,7 +41,7 @@ export default function SectionBPart2() {
     resolver: zodResolver(schema),
     defaultValues: {
       nextOfKin: {
-        surname: tenant.nextOfKin.surname,
+        name: tenant.nextOfKin.name,
         address: tenant.nextOfKin.address,
         telephone: tenant.nextOfKin.telephone,
         relationship: tenant.nextOfKin.relationship,
@@ -62,7 +57,7 @@ export default function SectionBPart2() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-primary lg:text-xl">
+      <h2 className="mb-3 text-lg font-semibold text-primary lg:text-xl">
         Section B
       </h2>
 
@@ -77,11 +72,11 @@ export default function SectionBPart2() {
               <div className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="nextOfKin.surname"
+                  name="nextOfKin.name"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>
-                        Surname{"  "}
+                      <FormLabel className="text-sm">
+                        Name{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
                       <FormControl>
@@ -90,10 +85,7 @@ export default function SectionBPart2() {
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
-                            handleFieldChange(
-                              "nextOfKin.surname",
-                              e.target.value,
-                            );
+                            handleFieldChange("nextOfKin.name", e.target.value);
                           }}
                         />
                       </FormControl>
@@ -107,7 +99,7 @@ export default function SectionBPart2() {
                   name="nextOfKin.address"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>
+                      <FormLabel className="text-sm">
                         Address{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
@@ -134,7 +126,7 @@ export default function SectionBPart2() {
                   name="nextOfKin.telephone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel className="text-sm">
                         Telephone{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
@@ -160,7 +152,7 @@ export default function SectionBPart2() {
                   name="nextOfKin.relationship"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel className="text-sm">
                         Relationship{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
@@ -186,7 +178,7 @@ export default function SectionBPart2() {
                   name="nextOfKin.placeOfWork"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel className="text-sm">
                         Place of Work{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
@@ -210,7 +202,24 @@ export default function SectionBPart2() {
             </div>
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setTenant(form.getValues());
+                  goToPrevSubStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button className="w-full" type="submit">
               Save & Go to next <ChevronRight />
             </Button>

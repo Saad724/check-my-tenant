@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -47,10 +47,10 @@ const schema = z.object({
 });
 
 export default function SectionCPart1() {
-  const { goToNextSubStep, setTenant } = useApplicationStore(
+  const { goToNextSubStep, goToPrevSubStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
-  const { tenant, actions } = useApplicationStore();
+  const { tenant, actions, step, subStep } = useApplicationStore();
 
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
@@ -113,7 +113,7 @@ export default function SectionCPart1() {
                           <div className="flex items-center justify-between">
                             <label
                               htmlFor="residential"
-                              className="text-sm font-medium text-gray-600"
+                              className="radio-label"
                             >
                               Residential
                             </label>
@@ -130,10 +130,7 @@ export default function SectionCPart1() {
                             />
                           </div>
                           <div className="flex items-center justify-between">
-                            <label
-                              htmlFor="commercial"
-                              className="text-sm font-medium text-gray-600"
-                            >
+                            <label htmlFor="commercial" className="radio-label">
                               Commercial
                             </label>
                             <input
@@ -161,9 +158,9 @@ export default function SectionCPart1() {
                 name="desiredImprovement"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>
+                    <FormLabel className="text-sm">
                       Desired Improvement on apartment{"  "}
-                      <span className="text-xs text-black">(Required*)</span>
+                      <span className="text-sm text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -188,10 +185,10 @@ export default function SectionCPart1() {
                 name="factorsStimulatingInterest"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>
+                    <FormLabel className="text-sm">
                       What factors really stimulates your interest in the
                       property?{"  "}
-                      <span className="text-xs text-black">(Required*)</span>
+                      <span className="text-sm text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -216,9 +213,9 @@ export default function SectionCPart1() {
                 name="initialRentAccepted"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>
+                    <FormLabel className="text-sm">
                       Initial rent accepted/Budget for desired location{"  "}
-                      <span className="text-xs text-black">(Required*)</span>
+                      <span className="text-sm text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -243,9 +240,9 @@ export default function SectionCPart1() {
                 name="petsInfo"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>
+                    <FormLabel className="text-sm">
                       Do you keep pets? If yes, what kind?{"  "}
-                      <span className="text-xs text-black">(Required*)</span>
+                      <span className="text-sm text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -267,9 +264,9 @@ export default function SectionCPart1() {
                 name="numberOfVehicles"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>
+                    <FormLabel className="text-sm">
                       Number of vehicles owned{"  "}
-                      <span className="text-xs text-black">(Required*)</span>
+                      <span className="text-sm text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -291,9 +288,9 @@ export default function SectionCPart1() {
                 name="presentResidenceAddress"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>
+                    <FormLabel className="text-sm">
                       Address of your present place of residence{"  "}
-                      <span className="text-xs text-black">(Required*)</span>
+                      <span className="text-sm text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -318,9 +315,9 @@ export default function SectionCPart1() {
                 name="nameAndAddressOfPresentLandlord"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>
+                    <FormLabel className="text-sm">
                       Name and address of present landlord{"  "}
-                      <span className="text-xs text-black">(Required*)</span>
+                      <span className="text-sm text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -345,9 +342,9 @@ export default function SectionCPart1() {
                 name="reasonForLeavingPresentResidence"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>
+                    <FormLabel className="text-sm">
                       Reason(s) for leaving present residence{"  "}
-                      <span className="text-xs text-black">(Required*)</span>
+                      <span className="text-sm text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -372,9 +369,9 @@ export default function SectionCPart1() {
                 name="numberOfOccupants"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>
+                    <FormLabel className="text-sm">
                       No. of intended occupants{"  "}
-                      <span className="text-xs text-black">(Required*)</span>
+                      <span className="text-sm text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -396,7 +393,35 @@ export default function SectionCPart1() {
             </div>
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  const values = form.getValues();
+                  // Convert purpose back to object format for store
+                  const purposeObject = {
+                    residential: values.purpose === "residential",
+                    commercial: values.purpose === "commercial",
+                  };
+
+                  setTenant({
+                    ...values,
+                    purpose: purposeObject,
+                    numberOfOccupants: parseInt(values.numberOfOccupants) || 0,
+                  });
+                  goToPrevSubStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button className="w-full" type="submit">
               Save & Go to next <ChevronRight />
             </Button>

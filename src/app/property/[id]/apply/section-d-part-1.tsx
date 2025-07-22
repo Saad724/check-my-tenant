@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -47,10 +47,10 @@ const schema = z.object({
 });
 
 export default function SectionDPart1() {
-  const { goToNextSubStep, setTenant } = useApplicationStore(
+  const { goToNextSubStep, goToPrevSubStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
-  const { tenant, actions } = useApplicationStore();
+  const { tenant, actions, step, subStep } = useApplicationStore();
 
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
@@ -78,7 +78,24 @@ export default function SectionDPart1() {
   });
 
   function onSubmit(values: z.infer<typeof schema>) {
-    setTenant(values);
+    // Add missing fields for guarantors
+    const updatedGuarantors = values.guarantors.map((guarantor) => ({
+      ...guarantor,
+      age: 0,
+      telephone: "",
+      address: "",
+      placeOfWorkAddress: "",
+      occupation: "",
+      positionInCompany: "",
+      maritalStatus: "",
+      signature: "",
+      date: "",
+    }));
+
+    setTenant({
+      ...values,
+      guarantors: updatedGuarantors,
+    });
     goToNextSubStep();
   }
 
@@ -296,7 +313,44 @@ export default function SectionDPart1() {
             </div>
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  const values = form.getValues();
+                  // Add missing fields for guarantors
+                  const updatedGuarantors = values.guarantors.map(
+                    (guarantor) => ({
+                      ...guarantor,
+                      age: 0,
+                      telephone: "",
+                      address: "",
+                      placeOfWorkAddress: "",
+                      occupation: "",
+                      positionInCompany: "",
+                      maritalStatus: "",
+                      signature: "",
+                      date: "",
+                    }),
+                  );
+
+                  setTenant({
+                    ...values,
+                    guarantors: updatedGuarantors,
+                  });
+                  goToPrevSubStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button className="w-full" type="submit">
               Save & Go to next <ChevronRight />
             </Button>

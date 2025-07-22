@@ -101,7 +101,7 @@ export default function SectionB() {
                   name="spouse.surname"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Surname</FormLabel>
+                      <FormLabel className="text-sm">Surname</FormLabel>
                       <FormControl>
                         <Input
                           className="w-full"
@@ -122,7 +122,7 @@ export default function SectionB() {
                   name="spouse.otherNames"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Other Names</FormLabel>
+                      <FormLabel className="text-sm">Other Names</FormLabel>
                       <FormControl>
                         <Input
                           className="w-full"
@@ -146,7 +146,7 @@ export default function SectionB() {
                   name="spouse.address"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Address</FormLabel>
+                      <FormLabel className="text-sm">Address</FormLabel>
                       <FormControl>
                         <Input
                           className="w-full"
@@ -167,7 +167,7 @@ export default function SectionB() {
                   name="spouse.telephone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Telephone</FormLabel>
+                      <FormLabel className="text-sm">Telephone</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -190,7 +190,7 @@ export default function SectionB() {
                   name="spouse.placeOfWork"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Place of Work</FormLabel>
+                      <FormLabel className="text-sm">Place of Work</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -221,7 +221,7 @@ export default function SectionB() {
                   name="nextOfKin.name"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel className="text-sm">Name</FormLabel>
                       <FormControl>
                         <Input
                           className="w-full"
@@ -242,7 +242,7 @@ export default function SectionB() {
                   name="nextOfKin.address"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Address</FormLabel>
+                      <FormLabel className="text-sm">Address</FormLabel>
                       <FormControl>
                         <Input
                           className="w-full"
@@ -266,7 +266,7 @@ export default function SectionB() {
                   name="nextOfKin.telephone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Telephone</FormLabel>
+                      <FormLabel className="text-sm">Telephone</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -289,7 +289,7 @@ export default function SectionB() {
                   name="nextOfKin.relationship"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Relationship</FormLabel>
+                      <FormLabel className="text-sm">Relationship</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -312,7 +312,7 @@ export default function SectionB() {
                   name="nextOfKin.placeOfWork"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Place of Work</FormLabel>
+                      <FormLabel className="text-sm">Place of Work</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -333,13 +333,13 @@ export default function SectionB() {
             </div>
           </div>
 
-          <div className="flex mt-5 items-center justify-between gap-4">
+          <div className="mt-5 flex items-center justify-between gap-4">
             <Button className="w-full" type="button" onClick={handlePrevious}>
               <ChevronLeft />
               Section A
             </Button>
 
-            <Button className=" w-full" type="submit">
+            <Button className="w-full" type="submit">
               Section C <ChevronRight />
             </Button>
           </div>

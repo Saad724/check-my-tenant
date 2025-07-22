@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronRight, Upload } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -144,6 +145,7 @@ function GuarantorStepper({
 
 export default function GuarantorForm() {
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [guarantorData, setGuarantorData] = useState<GuarantorData>({
     fullName: "",
     email: "",
@@ -216,6 +218,8 @@ export default function GuarantorForm() {
   function onSubmitStep4(values: Step4Data) {
     const id = "684b85593bffa0dced970cce"; // Replace with dynamic id if available
     setGuarantorData((prev) => ({ ...prev, ...values }));
+    setIsSubmitting(true);
+
     const payload = {
       fullName: guarantorData.fullName,
       emailAddress: guarantorData.email,
@@ -234,15 +238,19 @@ export default function GuarantorForm() {
       date: guarantorData.date,
       passport: "", // Add if available
     };
+
     apiRequest(`/api/tenants/update-guarantor?id=${id}`, {
       method: "POST",
       body: JSON.stringify(payload),
     })
       .then(() => {
-        alert("Guarantor form submitted successfully!");
+        toast.success("Guarantor form submitted successfully!");
       })
       .catch((e) => {
-        alert("Failed to submit guarantor form: " + e.message);
+        toast.error(e.message || "Failed to submit guarantor form");
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
   }
 
@@ -260,6 +268,7 @@ export default function GuarantorForm() {
             form={form4}
             onSubmit={onSubmitStep4}
             guarantorData={guarantorData}
+            isSubmitting={isSubmitting}
           />
         );
       default:
@@ -569,10 +578,12 @@ function Step4Form({
   form,
   onSubmit,
   guarantorData,
+  isSubmitting,
 }: {
   form: any;
   onSubmit: (values: Step4Data) => void;
   guarantorData: GuarantorData;
+  isSubmitting: boolean;
 }) {
   return (
     <div className="mx-auto max-w-4xl">
@@ -701,8 +712,18 @@ function Step4Form({
           />
 
           <div className="pt-4">
-            <Button type="submit" className="guarantor-primary w-full">
-              Submit <Check className="ml-2 h-4 w-4" />
+            <Button
+              type="submit"
+              className="guarantor-primary w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <div className="h-4 w-4 animate-spinner rounded-full border-2 border-t-2 border-t-white ease-linear"></div>
+              ) : (
+                <>
+                  Submit <Check className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
           </div>
         </form>

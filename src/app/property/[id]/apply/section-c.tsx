@@ -61,11 +61,9 @@ const schema = z.object({
   placeOfWorship: z
     .string()
     .min(1, { message: "Place of Worship is required" }),
-  possessionTiming: z.object({
-    immediately: z.boolean().default(false),
-    oneMonth: z.boolean().default(false),
-    threeMonths: z.boolean().default(false),
-  }),
+  possessionTiming: z
+    .string()
+    .min(1, { message: "Possession timing is required" }),
 });
 
 export default function SectionC() {
@@ -94,11 +92,7 @@ export default function SectionC() {
       religion: tenant.religion,
       nameAndContactOfPastor: tenant.nameAndContactOfPastor,
       placeOfWorship: tenant.placeOfWorship,
-      possessionTiming: {
-        immediately: false,
-        oneMonth: false,
-        threeMonths: false,
-      },
+      possessionTiming: tenant.possessionTiming || "",
     },
   });
 
@@ -130,7 +124,7 @@ export default function SectionC() {
                   name="purpose.residential"
                   render={({ field }) => (
                     <FormItem className="flex justify-between">
-                      <FormLabel>Residential</FormLabel>
+                      <FormLabel className="radio-label">Residential</FormLabel>
                       <FormControl>
                         <Checkbox
                           checked={field.value}
@@ -146,7 +140,7 @@ export default function SectionC() {
                   name="purpose.commercial"
                   render={({ field }) => (
                     <FormItem className="flex justify-between">
-                      <FormLabel>Commercial</FormLabel>
+                      <FormLabel className="radio-label">Commercial</FormLabel>
                       <FormControl>
                         <Checkbox
                           checked={field.value}
@@ -476,55 +470,76 @@ export default function SectionC() {
                 How soon do you want to take possession?
               </h3>
 
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="possessionTiming.immediately"
-                  render={({ field }) => (
-                    <FormItem className="flex justify-between">
-                      <FormLabel>Immediately</FormLabel>
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="possessionTiming.oneMonth"
-                  render={({ field }) => (
-                    <FormItem className="flex justify-between">
-                      <FormLabel>In One Month</FormLabel>
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="possessionTiming.threeMonths"
-                  render={({ field }) => (
-                    <FormItem className="flex justify-between">
-                      <FormLabel>In Three Months</FormLabel>
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="possessionTiming"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="Immediately" className="radio-label">
+                            Immediately
+                          </label>
+                          <input
+                            type="radio"
+                            id="Immediately"
+                            value="Immediately"
+                            checked={field.value === "Immediately"}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                              handleFieldChange(
+                                "possessionTiming",
+                                e.target.value,
+                              );
+                            }}
+                            className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="oneMonth" className="radio-label">
+                            In One Month
+                          </label>
+                          <input
+                            type="radio"
+                            id="oneMonth"
+                            value="oneMonth"
+                            checked={field.value === "oneMonth"}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                              handleFieldChange(
+                                "possessionTiming",
+                                e.target.value,
+                              );
+                            }}
+                            className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="threeMonths" className="radio-label">
+                            In Three Months
+                          </label>
+                          <input
+                            type="radio"
+                            id="threeMonths"
+                            value="threeMonths"
+                            checked={field.value === "threeMonths"}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                              handleFieldChange(
+                                "possessionTiming",
+                                e.target.value,
+                              );
+                            }}
+                            className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                          />
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
 

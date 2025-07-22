@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -35,10 +35,10 @@ const schema = z.object({
 });
 
 export default function SectionCPart2() {
-  const { goToNextSubStep, setTenant } = useApplicationStore(
+  const { goToNextSubStep, goToPrevSubStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
-  const { tenant, actions } = useApplicationStore();
+  const { tenant, actions, step, subStep } = useApplicationStore();
 
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
@@ -50,29 +50,16 @@ export default function SectionCPart2() {
       religion: tenant.religion || "",
       otherReligion: tenant.otherReligion || "",
       placeOfWorship: tenant.placeOfWorship,
-      possessionTiming: tenant.possessionTiming?.immediately
-        ? "immediately"
-        : tenant.possessionTiming?.oneMonth
-          ? "oneMonth"
-          : tenant.possessionTiming?.threeMonths
-            ? "threeMonths"
-            : "",
+      possessionTiming: tenant.possessionTiming || "",
       applicantSignature: tenant.applicantSignature,
       applicationDate: tenant.applicationDate,
     },
   });
 
   function onSubmit(values: z.infer<typeof schema>) {
-    // Convert possession timing back to object format for store
-    const possessionTimingObject = {
-      immediately: values.possessionTiming === "immediately",
-      oneMonth: values.possessionTiming === "oneMonth",
-      threeMonths: values.possessionTiming === "threeMonths",
-    };
-
     setTenant({
       ...values,
-      possessionTiming: possessionTimingObject,
+      possessionTiming: values.possessionTiming,
     });
     goToNextSubStep();
   }
@@ -100,10 +87,7 @@ export default function SectionCPart2() {
                       <FormControl>
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <label
-                              htmlFor="christian"
-                              className="text-sm font-medium text-gray-600"
-                            >
+                            <label htmlFor="christian" className="radio-label">
                               Christian
                             </label>
                             <input
@@ -119,10 +103,7 @@ export default function SectionCPart2() {
                             />
                           </div>
                           <div className="flex items-center justify-between">
-                            <label
-                              htmlFor="muslim"
-                              className="text-sm font-medium text-gray-600"
-                            >
+                            <label htmlFor="muslim" className="radio-label">
                               Muslim
                             </label>
                             <input
@@ -209,16 +190,16 @@ export default function SectionCPart2() {
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
                             <label
-                              htmlFor="immediately"
-                              className="text-sm font-medium text-gray-600"
+                              htmlFor="Immediately"
+                              className="radio-label"
                             >
                               Immediately
                             </label>
                             <input
                               type="radio"
-                              id="immediately"
-                              value="immediately"
-                              checked={field.value === "immediately"}
+                              id="Immediately"
+                              value="Immediately"
+                              checked={field.value === "Immediately"}
                               onChange={(e) => {
                                 field.onChange(e.target.value);
                                 handleFieldChange(
@@ -230,10 +211,7 @@ export default function SectionCPart2() {
                             />
                           </div>
                           <div className="flex items-center justify-between">
-                            <label
-                              htmlFor="oneMonth"
-                              className="text-sm font-medium text-gray-600"
-                            >
+                            <label htmlFor="oneMonth" className="radio-label">
                               One month
                             </label>
                             <input
@@ -254,7 +232,7 @@ export default function SectionCPart2() {
                           <div className="flex items-center justify-between">
                             <label
                               htmlFor="threeMonths"
-                              className="text-sm font-medium text-gray-600"
+                              className="radio-label"
                             >
                               Three month
                             </label>
@@ -337,7 +315,24 @@ export default function SectionCPart2() {
             </div>
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setTenant(form.getValues());
+                  goToPrevSubStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button className="w-full" type="submit">
               Save & Go to next <ChevronRight />
             </Button>

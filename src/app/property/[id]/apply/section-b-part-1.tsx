@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -20,6 +20,7 @@ import { useApplicationStore } from "@/store/application";
 const schema = z.object({
   spouse: z.object({
     surname: z.string().min(1, { message: "Surname is required" }),
+    otherNames: z.string().min(1, { message: "Other Names are required" }),
     address: z.string().min(1, { message: "Address is required" }),
     telephone: z
       .string()
@@ -27,16 +28,15 @@ const schema = z.object({
         message: "Mobile Number is required and should be atleast 11 numbers",
       })
       .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
-    relationship: z.string().min(1, { message: "Relationship is required" }),
     placeOfWork: z.string().min(2, { message: "Place of Work is required" }),
   }),
 });
 
 export default function SectionBPart1() {
-  const { goToNextSubStep, setTenant } = useApplicationStore(
+  const { goToNextSubStep, goToPrevSubStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
-  const { tenant, actions } = useApplicationStore();
+  const { tenant, actions, step, subStep } = useApplicationStore();
 
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
@@ -47,9 +47,9 @@ export default function SectionBPart1() {
     defaultValues: {
       spouse: {
         surname: tenant.spouse.surname,
+        otherNames: tenant.spouse.otherNames,
         address: tenant.spouse.address,
         telephone: tenant.spouse.telephone,
-        relationship: tenant.spouse.relationship,
         placeOfWork: tenant.spouse.placeOfWork,
       },
     },
@@ -78,7 +78,7 @@ export default function SectionBPart1() {
                   name="spouse.surname"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>
+                      <FormLabel className="text-sm">
                         Surname{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
@@ -102,7 +102,7 @@ export default function SectionBPart1() {
                   name="spouse.address"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>
+                      <FormLabel className="text-sm">
                         Address{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
@@ -126,7 +126,7 @@ export default function SectionBPart1() {
                   name="spouse.telephone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel className="text-sm">
                         Telephone{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
@@ -149,11 +149,11 @@ export default function SectionBPart1() {
 
                 <FormField
                   control={form.control}
-                  name="spouse.relationship"
+                  name="spouse.otherNames"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        Relationship{"  "}
+                      <FormLabel className="text-sm">
+                        Other Names{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
                       <FormControl>
@@ -162,7 +162,7 @@ export default function SectionBPart1() {
                           onChange={(e) => {
                             field.onChange(e);
                             handleFieldChange(
-                              "spouse.relationship",
+                              "spouse.otherNames",
                               e.target.value,
                             );
                           }}
@@ -178,7 +178,7 @@ export default function SectionBPart1() {
                   name="spouse.placeOfWork"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel className="text-sm">
                         Place of Work{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
@@ -202,7 +202,24 @@ export default function SectionBPart1() {
             </div>
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setTenant(form.getValues());
+                  goToPrevSubStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button className="w-full" type="submit">
               Save & Go to next <ChevronRight />
             </Button>

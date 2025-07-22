@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { apiRequest } from "@/lib/utils";
 import { Tenant, useApplicationStore } from "@/store/application";
 
 const schema = z.object({
@@ -37,10 +38,9 @@ export default function SectionD({
   landlordId: string;
   propertyId: string;
 }) {
-  const tenant = useApplicationStore((store) => store.tenant);
-  const { goToNextSubStep, setTenant } = useApplicationStore(
-    (store) => store.actions,
-  );
+  const { tenant, step, subStep } = useApplicationStore();
+  const { goToNextSubStep, goToPrevSubStep, setTenant, goToFinish } =
+    useApplicationStore((store) => store.actions);
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -60,20 +60,21 @@ export default function SectionD({
 
   const mutation = useMutation({
     mutationFn: async (data: Tenant) => {
-      await fetch(
-        "http://check-my-tenant.vercel.app/api/tenants/tenant-application",
-        {
-          method: "POST",
-          body: JSON.stringify(data),
-        },
-      );
+      const response = await apiRequest("/api/tenants/tenant-application", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      if (response && response.message && response.status === "error") {
+        throw new Error(response.message);
+      }
+      return response;
     },
-    onError: (error) => {
-      toast.error(error.message);
+    onError: (error: any) => {
+      toast.error(error.message || "Application submission failed");
     },
-    onSuccess: () => {
-      goToNextSubStep();
+    onSuccess: (data) => {
       toast.success("Application submitted successfully");
+      goToFinish();
     },
   });
 
@@ -238,12 +239,7 @@ export default function SectionD({
     if (!tenant.numberOfOccupants) missingFields.push("Number of Occupants");
     if (!tenant.religion) missingFields.push("Religion");
     if (!tenant.placeOfWorship) missingFields.push("Place of Worship");
-    if (
-      !tenant.possessionTiming.immediately &&
-      !tenant.possessionTiming.oneMonth &&
-      !tenant.possessionTiming.threeMonths
-    )
-      missingFields.push("Possession Timing");
+    if (!tenant.possessionTiming) missingFields.push("Possession Timing");
     if (!tenant.applicantSignature) missingFields.push("Applicant Signature");
     if (!tenant.applicationDate) missingFields.push("Application Date");
 
@@ -371,7 +367,44 @@ export default function SectionD({
             </div>
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  const values = form.getValues();
+                  // Add missing fields for guarantors
+                  const updatedGuarantors = values.guarantors.map(
+                    (guarantor) => ({
+                      ...guarantor,
+                      age: 0,
+                      telephone: "",
+                      address: "",
+                      placeOfWorkAddress: "",
+                      occupation: "",
+                      positionInCompany: "",
+                      maritalStatus: "",
+                      signature: "",
+                      date: "",
+                    }),
+                  );
+
+                  setTenant({
+                    ...values,
+                    guarantors: updatedGuarantors,
+                  });
+                  goToPrevSubStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button
               className="w-full"
               type="submit"

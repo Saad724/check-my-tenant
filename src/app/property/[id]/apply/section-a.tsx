@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -66,10 +66,10 @@ const schema = z.object({
 });
 
 export default function SectionA() {
-  const { goToNextStep, setTenant } = useApplicationStore(
+  const { goToNextStep, goToPrevStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
-  const { tenant, actions } = useApplicationStore();
+  const { tenant, actions, step, subStep } = useApplicationStore();
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
   };
@@ -147,7 +147,7 @@ export default function SectionA() {
               name="nin"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     NIN{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -188,7 +188,7 @@ export default function SectionA() {
               name="surname"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Surname{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -212,7 +212,7 @@ export default function SectionA() {
               name="otherNames"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Other Names{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -236,7 +236,7 @@ export default function SectionA() {
               name="contactAddress"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Contact Address{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -260,7 +260,7 @@ export default function SectionA() {
               name="nationality"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Nationality{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -284,7 +284,7 @@ export default function SectionA() {
               name="passportNo"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Passport No. (If Non-Nigerian)
                     <span className="text-xs text-black"> </span>
                   </FormLabel>
@@ -308,7 +308,7 @@ export default function SectionA() {
               name="stateOfOrigin"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     State of Origin{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -332,7 +332,7 @@ export default function SectionA() {
               name="localGovernment"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Local Government{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -356,7 +356,7 @@ export default function SectionA() {
               name="townOfOrigin"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Town/Village{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -380,7 +380,7 @@ export default function SectionA() {
               name="maritalStatus"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Marital Status{" "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -404,7 +404,7 @@ export default function SectionA() {
               name="dateOfBirth"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Date of Birth{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -429,7 +429,7 @@ export default function SectionA() {
               name="telephone"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Telephone{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -453,7 +453,7 @@ export default function SectionA() {
               name="personalEmail"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Personal Email{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -477,7 +477,7 @@ export default function SectionA() {
               name="numberOfChildren"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Number of Children{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -503,7 +503,7 @@ export default function SectionA() {
               name="domicileEmail"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Domicile Email{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -527,7 +527,7 @@ export default function SectionA() {
               name="profession"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Profession/Occupation{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -551,7 +551,7 @@ export default function SectionA() {
               name="position"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Position{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -575,7 +575,7 @@ export default function SectionA() {
               name="officeAddress"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Office/Business Address{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -599,7 +599,7 @@ export default function SectionA() {
               name="officePhone"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Office Phone{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -623,7 +623,7 @@ export default function SectionA() {
               name="formOfIdentification"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Form of Identification{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -646,7 +646,24 @@ export default function SectionA() {
             />
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setTenant(form.getValues());
+                  goToPrevStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button className="w-full" type="submit">
               Save & Go to next <ChevronRight />
             </Button>

@@ -36,11 +36,21 @@ type Property = {
 };
 
 async function getPropertyById(id: string) {
-  const res = await axios.get<{ property: Property }>(
-    `https://check-my-tenant.vercel.app/api/property/get-by-id?id=${id}`,
-  );
-
-  return res.data;
+  try {
+    const res = await axios.get<{ property: Property }>(
+      `https://check-my-tenant.vercel.app/api/property/get-by-id?id=${id}`,
+    );
+    return res.data;
+  } catch (error: any) {
+    // Handle axios errors and extract meaningful message
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    } else if (error.message) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Failed to load property");
+    }
+  }
 }
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -49,8 +59,19 @@ export default function Page({ params }: { params: { id: string } }) {
     queryFn: () => getPropertyById(params.id),
   });
 
-  if (propertyQuery.isError)
-    return <div>Error: {propertyQuery.error.message}</div>;
+  if (propertyQuery.isError) {
+    // Show error toast and return error UI
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-red-600">
+            Error Loading Property
+          </h2>
+          <p className="mt-2 text-gray-600">{propertyQuery.error.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (propertyQuery.data)
     return (

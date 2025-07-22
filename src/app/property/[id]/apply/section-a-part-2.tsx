@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -50,10 +50,10 @@ const schema = z.object({
 });
 
 export default function SectionAPart2() {
-  const { goToNextSubStep, setTenant } = useApplicationStore(
+  const { goToNextSubStep, goToPrevSubStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
-  const { tenant, actions } = useApplicationStore();
+  const { tenant, actions, step, subStep } = useApplicationStore();
 
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
@@ -71,7 +71,7 @@ export default function SectionAPart2() {
       position: tenant.position,
       officeAddress: tenant.officeAddress,
       formOfIdentification: tenant.formOfIdentification,
-      officeEmail: tenant.officeEmail,
+      officeEmail: tenant.officePhone,
     },
   });
 
@@ -82,7 +82,7 @@ export default function SectionAPart2() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-primary lg:text-xl">
+      <h2 className="mb-3 text-lg font-semibold text-primary lg:text-xl">
         Section A
       </h2>
 
@@ -335,7 +335,24 @@ export default function SectionAPart2() {
             />
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setTenant(form.getValues());
+                  goToPrevSubStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button className="w-full" type="submit">
               Save & Go to next <ChevronRight />
             </Button>

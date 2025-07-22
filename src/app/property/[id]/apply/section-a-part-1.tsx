@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -33,13 +33,19 @@ const schema = z.object({
     .min(1, { message: "Local Government is required" }),
   townOfOrigin: z.string().min(1, { message: "Town of Origin is required" }),
   email: z.string().email({ message: "Email is required" }),
+  telephone: z
+    .string()
+    .min(11, {
+      message: "Mobile Number is required and should be atleast 11 numbers",
+    })
+    .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
 });
 
 export default function SectionAPart1() {
-  const { goToNextSubStep, setTenant } = useApplicationStore(
+  const { goToNextSubStep, goToPrevSubStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
-  const { tenant, actions } = useApplicationStore();
+  const { tenant, actions, step, subStep } = useApplicationStore();
 
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
@@ -58,6 +64,7 @@ export default function SectionAPart1() {
       localGovernment: tenant.localGovernment,
       townOfOrigin: tenant.townOfOrigin,
       email: tenant.email,
+      telephone: tenant.telephone,
     },
   });
 
@@ -66,10 +73,11 @@ export default function SectionAPart1() {
       const nin = values.nin;
       const name = `${values.surname} ${values.otherNames}`;
       const email = values.email;
-      await apiRequest("/api/accounts/verify-guest-identity", {
-        method: "POST",
-        body: JSON.stringify({ nin, name, email }),
-      });
+      // await apiRequest("/api/accounts/verify-guest-identity", {
+      //   method: "POST",
+      //   body: JSON.stringify({ nin, name, email, phone: values.telephone }),
+      // });
+      // toast.success("NIN verified successfully!");
       setTenant(values);
       goToNextSubStep();
     } catch (e: any) {
@@ -79,7 +87,7 @@ export default function SectionAPart1() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-primary lg:text-xl">
+      <h2 className="mb-3 text-lg font-semibold text-primary lg:text-xl">
         Section A
       </h2>
 
@@ -91,7 +99,7 @@ export default function SectionAPart1() {
               name="nin"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     NIN{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -115,7 +123,7 @@ export default function SectionAPart1() {
               name="surname"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Surname{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -139,7 +147,7 @@ export default function SectionAPart1() {
               name="otherNames"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Other Names{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -163,7 +171,7 @@ export default function SectionAPart1() {
               name="contactAddress"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Contact Address{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -187,7 +195,7 @@ export default function SectionAPart1() {
               name="nationality"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Nationality{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -211,7 +219,7 @@ export default function SectionAPart1() {
               name="passportNo"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Passport No. (If Non-Nigerian)
                     <span className="text-xs text-black"> </span>
                   </FormLabel>
@@ -235,7 +243,7 @@ export default function SectionAPart1() {
               name="stateOfOrigin"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     State of Origin{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -259,7 +267,7 @@ export default function SectionAPart1() {
               name="localGovernment"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Local Government{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -283,7 +291,7 @@ export default function SectionAPart1() {
               name="townOfOrigin"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Town/Village{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -307,7 +315,7 @@ export default function SectionAPart1() {
               name="email"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>
+                  <FormLabel className="text-sm">
                     Email{"  "}
                     <span className="text-xs text-black">(Required*)</span>
                   </FormLabel>
@@ -326,9 +334,51 @@ export default function SectionAPart1() {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="telephone"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel className="text-sm">
+                    Phone{"  "}
+                    <span className="text-xs text-black">(Required*)</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="w-full"
+                      type="tel"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleFieldChange("telephone", e.target.value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setTenant(form.getValues());
+                  goToPrevSubStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button className="w-full" type="submit">
               Save & Go to next <ChevronRight />
             </Button>

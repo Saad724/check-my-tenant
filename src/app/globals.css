@@ -96,6 +96,32 @@
   color: #fff !important;
   border: none !important;
 }
+
+/* Radio Label Styles */
+.radio-label {
+  font-family: Inter;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: #979696;
+}
+
+/* Loading Spinner Animation */
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spinner {
+  animation: spinner 1s linear infinite;
+}
+
 .guarantor-h2 {
   color: #00a69a !important;
   font-size: 1.125rem;

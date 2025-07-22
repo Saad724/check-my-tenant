@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -56,10 +56,9 @@ export default function SectionDPart2({
   landlordId: string;
   propertyId: string;
 }) {
-  const tenant = useApplicationStore((store) => store.tenant);
-  const { goToNextSubStep, setTenant } = useApplicationStore(
-    (store) => store.actions,
-  );
+  const { tenant, step, subStep } = useApplicationStore();
+  const { goToNextSubStep, goToPrevSubStep, setTenant, goToFinish } =
+    useApplicationStore((store) => store.actions);
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -98,7 +97,7 @@ export default function SectionDPart2({
     },
     onSuccess: (data) => {
       toast.success("Application submitted successfully");
-      goToNextSubStep();
+      goToFinish();
     },
   });
 
@@ -347,7 +346,44 @@ export default function SectionDPart2({
             </div>
           </div>
 
-          <div className="my-5">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            {step > 1 || subStep > 1 ? (
+              <Button
+                className="w-full"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  const values = form.getValues();
+                  // Add missing fields for guarantors
+                  const updatedGuarantors = values.guarantors.map(
+                    (guarantor) => ({
+                      ...guarantor,
+                      age: 0,
+                      telephone: "",
+                      address: "",
+                      placeOfWorkAddress: "",
+                      occupation: "",
+                      positionInCompany: "",
+                      maritalStatus: "",
+                      signature: "",
+                      date: "",
+                    }),
+                  );
+
+                  setTenant({
+                    ...values,
+                    guarantors: updatedGuarantors,
+                  });
+                  goToPrevSubStep();
+                }}
+              >
+                <ChevronLeft />
+                Back
+              </Button>
+            ) : (
+              <div className="w-full"></div>
+            )}
+
             <Button
               className="w-full"
               type="submit"
