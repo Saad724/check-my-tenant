@@ -774,7 +774,7 @@ export default function GuarantorForm() {
           application
         </h1>
         <p className="guarantor-subheading mt-4">
-          As a Guarantor, you are responsible for Dwight Schrute's apartment
+          As a Guarantor, you are responsible for Dwight Schrute&apos;s apartment
           rental obligations
         </p>
       </div>
