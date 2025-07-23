@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { apiRequest } from "@/lib/utils";
 import { Tenant, useApplicationStore } from "@/store/application";
+import { useParams } from 'next/navigation';
 
 const schema = z.object({
   guarantors: z
@@ -34,10 +35,14 @@ const schema = z.object({
 export default function SectionD({
   landlordId,
   propertyId,
+  
 }: {
   landlordId: string;
   propertyId: string;
 }) {
+  const params = useParams();
+  const applicationID = params.applicationID;
+
   const { tenant, step, subStep } = useApplicationStore();
   const { goToNextSubStep, goToPrevSubStep, setTenant, goToFinish } =
     useApplicationStore((store) => store.actions);
@@ -97,7 +102,7 @@ export default function SectionD({
       ...tenant,
       landlordId,
       propertyId,
-      applicationId: "67f179e0f06e8a946c27581b",
+      applicationId: applicationID,
       guarantors: updatedGuarantors,
     };
 
@@ -368,7 +373,7 @@ export default function SectionD({
           </div>
 
           <div className="mt-5 flex items-center justify-between gap-4">
-            {step > 1 || subStep > 1 ? (
+            {/* {step > 1 || subStep > 1 ? (
               <Button
                 className="w-full"
                 type="button"
@@ -403,10 +408,10 @@ export default function SectionD({
               </Button>
             ) : (
               <div className="w-full"></div>
-            )}
+            )} */}
 
             <Button
-              className="w-full"
+              className="w-full h-[52px]"
               type="submit"
               disabled={mutation.isPending}
             >

@@ -21,7 +21,6 @@ import { apiRequest } from "@/lib/utils";
 import { useApplicationStore } from "@/store/application";
 
 const schema = z.object({
-  nin: z.string().min(1, { message: "NIN is required" }),
   surname: z.string().min(1, { message: "Surname is required" }),
   otherNames: z.string().min(1, { message: "Other Names are required" }),
   contactAddress: z.string().min(1, { message: "Contact Address is required" }),
@@ -32,13 +31,6 @@ const schema = z.object({
     .string()
     .min(1, { message: "Local Government is required" }),
   townOfOrigin: z.string().min(1, { message: "Town of Origin is required" }),
-  email: z.string().email({ message: "Email is required" }),
-  telephone: z
-    .string()
-    .min(11, {
-      message: "Mobile Number is required and should be atleast 11 numbers",
-    })
-    .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
 });
 
 export default function SectionAPart1() {
@@ -54,7 +46,6 @@ export default function SectionAPart1() {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      nin: tenant.nin,
       surname: tenant.surname,
       otherNames: tenant.otherNames,
       contactAddress: tenant.contactAddress,
@@ -63,26 +54,12 @@ export default function SectionAPart1() {
       stateOfOrigin: tenant.stateOfOrigin,
       localGovernment: tenant.localGovernment,
       townOfOrigin: tenant.townOfOrigin,
-      email: tenant.email,
-      telephone: tenant.telephone,
     },
   });
 
   async function onSubmit(values: z.infer<typeof schema>) {
-    try {
-      const nin = values.nin;
-      const name = `${values.surname} ${values.otherNames}`;
-      const email = values.email;
-      await apiRequest("/api/accounts/verify-guest-identity", {
-        method: "POST",
-        body: JSON.stringify({ nin, name, email, phone: values.telephone }),
-      });
-      toast.success("NIN verified successfully!");
-      setTenant(values);
-      goToNextSubStep();
-    } catch (e: any) {
-      toast.error(e.message || "NIN verification failed.");
-    }
+    setTenant(values);
+    goToNextSubStep();
   }
 
   return (
@@ -94,7 +71,7 @@ export default function SectionAPart1() {
       <Form {...form}>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-4">
-            <FormField
+            {/* <FormField
               control={form.control}
               name="nin"
               render={({ field }) => (
@@ -116,7 +93,7 @@ export default function SectionAPart1() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <FormField
               control={form.control}
@@ -309,60 +286,10 @@ export default function SectionAPart1() {
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel className="text-sm">
-                    Email{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      type="email"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("email", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="telephone"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel className="text-sm">
-                    Phone{"  "}
-                    <span className="text-xs text-black">(Required*)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-full"
-                      type="tel"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleFieldChange("telephone", e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           <div className="mt-5 flex items-center justify-between gap-4">
-            {step > 1 || subStep > 1 ? (
+            {/* {step > 1 || subStep > 1 ? (
               <Button
                 className="w-full"
                 type="button"
@@ -377,9 +304,9 @@ export default function SectionAPart1() {
               </Button>
             ) : (
               <div className="w-full"></div>
-            )}
+            )} */}
 
-            <Button className="w-full" type="submit">
+            <Button className="h-[52px] w-full" type="submit">
               Save & Go to next <ChevronRight />
             </Button>
           </div>

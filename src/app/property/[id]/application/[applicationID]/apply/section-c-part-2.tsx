@@ -316,7 +316,7 @@ export default function SectionCPart2() {
           </div>
 
           <div className="mt-5 flex items-center justify-between gap-4">
-            {step > 1 || subStep > 1 ? (
+            {/* {step > 1 || subStep > 1 ? (
               <Button
                 className="w-full"
                 type="button"
@@ -331,9 +331,9 @@ export default function SectionCPart2() {
               </Button>
             ) : (
               <div className="w-full"></div>
-            )}
+            )} */}
 
-            <Button className="w-full" type="submit">
+            <Button className="w-full h-[52px]" type="submit">
               Save & Go to next <ChevronRight />
             </Button>
           </div>

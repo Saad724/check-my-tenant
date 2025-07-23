@@ -1,10 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -17,8 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { apiRequest } from "@/lib/utils";
-import { Tenant, useApplicationStore } from "@/store/application";
+import { useApplicationStore } from "@/store/application";
 
 const schema = z.object({
   guarantors: z.array(
@@ -49,98 +46,57 @@ const schema = z.object({
   ),
 });
 
-export default function SectionDPart2({
-  landlordId,
-  propertyId,
-}: {
-  landlordId: string;
-  propertyId: string;
-}) {
-  const { tenant, step, subStep } = useApplicationStore();
-  const { goToNextSubStep, goToPrevSubStep, setTenant, goToFinish } =
-    useApplicationStore((store) => store.actions);
+export default function SectionDPart1() {
+  const { goToNextSubStep, goToPrevSubStep, setTenant } = useApplicationStore(
+    (store) => store.actions,
+  );
+  const { tenant, actions, step, subStep } = useApplicationStore();
+
+  const handleFieldChange = (name: string, value: any) => {
+    actions.setTenant({ [name]: value });
+  };
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       guarantors: [
         {
-          name: tenant.guarantors?.[1]?.name || "",
-          email: tenant.guarantors?.[1]?.email || "",
-          // age: tenant.guarantors?.[1]?.age || 0,
-          // telephone: tenant.guarantors?.[1]?.telephone || "",
-          // address: tenant.guarantors?.[1]?.address || "",
-          // placeOfWorkAddress: tenant.guarantors?.[1]?.placeOfWorkAddress || "",
-          // occupation: tenant.guarantors?.[1]?.occupation || "",
-          // positionInCompany: tenant.guarantors?.[1]?.positionInCompany || "",
-          // maritalStatus: tenant.guarantors?.[1]?.maritalStatus || "",
-          // signature: tenant.guarantors?.[1]?.signature || "",
-          // date: tenant.guarantors?.[1]?.date || "",
+          name: tenant.guarantors?.[0]?.name || "",
+          email: tenant.guarantors?.[0]?.email || "",
+          // age: tenant.guarantors?.[0]?.age || 0,
+          // telephone: tenant.guarantors?.[0]?.telephone || "",
+          // address: tenant.guarantors?.[0]?.address || "",
+          // placeOfWorkAddress: tenant.guarantors?.[0]?.placeOfWorkAddress || "",
+          // occupation: tenant.guarantors?.[0]?.occupation || "",
+          // positionInCompany: tenant.guarantors?.[0]?.positionInCompany || "",
+          // maritalStatus: tenant.guarantors?.[0]?.maritalStatus || "",
+          // signature: tenant.guarantors?.[0]?.signature || "",
+          // date: tenant.guarantors?.[0]?.date || "",
         },
       ],
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: async (data: Tenant) => {
-      const response = await apiRequest("/api/tenants/tenant-application", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      if (response && response.message && response.status === "error") {
-        throw new Error(response.message);
-      }
-      return response;
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Application submission failed");
-    },
-    onSuccess: (data) => {
-      toast.success("Application submitted successfully");
-      goToFinish();
-    },
-  });
-
   function onSubmit(values: z.infer<typeof schema>) {
-    // Merge with existing guarantor A data
-    const updatedGuarantors = [
-      tenant.guarantors?.[0] || {
-        name: "",
-        email: "",
-        age: 0,
-        telephone: "",
-        address: "",
-        placeOfWorkAddress: "",
-        occupation: "",
-        positionInCompany: "",
-        maritalStatus: "",
-        signature: "",
-        date: "",
-      },
-      {
-        ...values.guarantors[0],
-        age: 0,
-        telephone: "",
-        address: "",
-        placeOfWorkAddress: "",
-        occupation: "",
-        positionInCompany: "",
-        maritalStatus: "",
-        signature: "",
-        date: "",
-      },
-    ];
+    // Add missing fields for guarantors
+    const updatedGuarantors = values.guarantors.map((guarantor) => ({
+      ...guarantor,
+      age: 0,
+      telephone: "",
+      address: "",
+      placeOfWorkAddress: "",
+      occupation: "",
+      positionInCompany: "",
+      maritalStatus: "",
+      signature: "",
+      date: "",
+    }));
 
-    const finalData = {
-      ...tenant,
-      landlordId,
-      propertyId,
-      applicationId: "67f179e0f06e8a946c27581b",
+    setTenant({
+      ...values,
       guarantors: updatedGuarantors,
-    };
-
-    console.log(finalData);
-    mutation.mutate(finalData);
+    });
+    goToNextSubStep();
   }
 
   return (
@@ -152,8 +108,19 @@ export default function SectionDPart2({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div>
+            <h3 className="my-4 text-sm font-semibold uppercase text-black">
+              Guarantors
+            </h3>
+            <p className="text-sm">
+              (Please give names and addresses of 2 persons; who shall be
+              required to provide a letter of guarantee/recommendation on letter
+              headed paper).
+            </p>
+          </div>
+
+          <div>
             <h4 className="my-6 text-sm font-semibold uppercase text-black">
-              Guarantor B
+              Guarantor A
             </h4>
 
             <div className="space-y-4">
@@ -316,7 +283,7 @@ export default function SectionDPart2({
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>
-                      Signature{"  "}
+                      Signature (Your Government Name){"  "}
                       <span className="text-xs text-black">(Required*)</span>
                     </FormLabel>
                     <FormControl>
@@ -347,7 +314,7 @@ export default function SectionDPart2({
           </div>
 
           <div className="mt-5 flex items-center justify-between gap-4">
-            {step > 1 || subStep > 1 ? (
+            {/* {step > 1 || subStep > 1 ? (
               <Button
                 className="w-full"
                 type="button"
@@ -382,20 +349,10 @@ export default function SectionDPart2({
               </Button>
             ) : (
               <div className="w-full"></div>
-            )}
+            )} */}
 
-            <Button
-              className="w-full"
-              type="submit"
-              disabled={mutation.isPending}
-            >
-              {mutation.isPending ? (
-                <div className="h-4 w-4 animate-spinner rounded-full border-2 border-t-2 border-t-primary ease-linear"></div>
-              ) : (
-                <>
-                  Submit <ChevronRight />
-                </>
-              )}
+            <Button className="w-full h-[52px]" type="submit">
+              Save & Go to next <ChevronRight />
             </Button>
           </div>
         </form>

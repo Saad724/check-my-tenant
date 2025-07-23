@@ -26,6 +26,7 @@ export type Tenant = {
   officeAddress: string;
   formOfIdentification: string;
   officePhone: string;
+  fullName: string;
   spouse: {
     surname: string;
     otherNames: string;
@@ -107,6 +108,7 @@ const initState = {
     propertyId: "",
     nin: "",
     surname: "",
+    fullName: '',
     otherNames: "",
     contactAddress: "",
     nationality: "",
