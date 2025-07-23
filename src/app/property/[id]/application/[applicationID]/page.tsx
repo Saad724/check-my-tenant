@@ -9,6 +9,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/lib/utils";
+import { useApplicationStore } from "@/store/application";
 
 type Property = {
   amenities: {
@@ -53,10 +55,38 @@ async function getPropertyById(id: string) {
   }
 }
 
-export default function Page({ params }: { params: { id: string } }) {
+async function getApplicationById(id: string) {
+  try {
+    const res = await apiRequest(`/api/tenants/application/${id}`, {
+      method: "GET",
+    });
+    return res.application;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    } else if (error.message) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Failed to load application");
+    }
+  }
+}
+
+export default function Page({
+  params,
+}: {
+  params: { id: string; applicationID: string };
+}) {
+  const { setTenant } = useApplicationStore((store) => store.actions);
+
   const propertyQuery = useQuery({
     queryKey: ["property", params.id],
     queryFn: () => getPropertyById(params.id),
+  });
+
+  const applicationQuery = useQuery({
+    queryKey: ["application", params.applicationID],
+    queryFn: () => getApplicationById(params.applicationID),
   });
 
   if (propertyQuery.isError) {
@@ -67,13 +97,21 @@ export default function Page({ params }: { params: { id: string } }) {
           <h2 className="text-xl font-semibold text-red-600">
             Error Loading Property
           </h2>
-          <p className="mt-2 text-gray-600">{propertyQuery.error.message}</p>
+          <p className="mt-2 text-gray-600">{propertyQuery?.error?.message}</p>
         </div>
       </div>
     );
   }
 
-  if (propertyQuery.data)
+  if (propertyQuery.data) {
+    if(applicationQuery.data) {
+      localStorage.setItem('guarantorFreeIdentityVerificationExhausted', String(applicationQuery.data.guarantorFreeIdentityVerificationExhausted))
+      setTenant(applicationQuery.data);
+    }
+    else {
+      localStorage.setItem('guarantorFreeIdentityVerificationExhausted', 'false')
+    }
+
     return (
       <main>
         <div className="px-4">
@@ -86,7 +124,8 @@ export default function Page({ params }: { params: { id: string } }) {
             asChild
             className="mt-4 w-full items-center justify-center lg:flex lg:w-[500px]"
           >
-            <Link href={`/property/${params.id}/apply`}>Apply</Link>
+            {/* <Link href={`/property/${params.id}/apply`}>Apply</Link> */}
+            <Link href={`/verify-identity/${params.id}`}>Apply</Link>
           </Button>
 
           <div className="mt-6">
@@ -204,15 +243,17 @@ export default function Page({ params }: { params: { id: string } }) {
             asChild
             className="mt-5 w-full items-center justify-center lg:flex lg:w-[500px]"
           >
-            <Link href={`/property/${params.id}/apply`}>Apply</Link>
+            {/* <Link href={`/property/${params.id}/apply`}>Apply</Link> */}
+            <Link href={`/verify-identity/${params.id}`}>Apply</Link>
           </Button>
         </div>
       </main>
     );
 
-  return (
-    <main>
-      <div>Loading...</div>
-    </main>
-  );
+    return (
+      <main>
+        <div>Loading...</div>
+      </main>
+    );
+  }
 }

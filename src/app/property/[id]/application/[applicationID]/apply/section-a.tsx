@@ -647,7 +647,7 @@ export default function SectionA() {
           </div>
 
           <div className="mt-5 flex items-center justify-between gap-4">
-            {step > 1 || subStep > 1 ? (
+            {/* {step > 1 || subStep > 1 ? (
               <Button
                 className="w-full"
                 type="button"
@@ -662,9 +662,9 @@ export default function SectionA() {
               </Button>
             ) : (
               <div className="w-full"></div>
-            )}
+            )} */}
 
-            <Button className="w-full" type="submit">
+            <Button className="w-full h-[52px]" type="submit">
               Save & Go to next <ChevronRight />
             </Button>
           </div>

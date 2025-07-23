@@ -18,21 +18,16 @@ import { Input } from "@/components/ui/input";
 import { useApplicationStore } from "@/store/application";
 
 const schema = z.object({
-  spouse: z.object({
-    surname: z.string().min(1, { message: "Surname is required" }),
-    otherNames: z.string().min(1, { message: "Other Names are required" }),
+  nextOfKin: z.object({
+    name: z.string().min(1, { message: "Name is required" }),
     address: z.string().min(1, { message: "Address is required" }),
-    telephone: z
-      .string()
-      .min(11, {
-        message: "Mobile Number is required and should be atleast 11 numbers",
-      })
-      .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
-    placeOfWork: z.string().min(2, { message: "Place of Work is required" }),
+    telephone: z.string().min(1, { message: "Telephone is required" }),
+    relationship: z.string().min(1, { message: "Relationship is required" }),
+    placeOfWork: z.string().min(1, { message: "Place of Work is required" }),
   }),
 });
 
-export default function SectionBPart1() {
+export default function SectionBPart2() {
   const { goToNextSubStep, goToPrevSubStep, setTenant } = useApplicationStore(
     (store) => store.actions,
   );
@@ -45,12 +40,12 @@ export default function SectionBPart1() {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      spouse: {
-        surname: tenant.spouse.surname,
-        otherNames: tenant.spouse.otherNames,
-        address: tenant.spouse.address,
-        telephone: tenant.spouse.telephone,
-        placeOfWork: tenant.spouse.placeOfWork,
+      nextOfKin: {
+        name: tenant.nextOfKin.name,
+        address: tenant.nextOfKin.address,
+        telephone: tenant.nextOfKin.telephone,
+        relationship: tenant.nextOfKin.relationship,
+        placeOfWork: tenant.nextOfKin.placeOfWork,
       },
     },
   });
@@ -62,7 +57,7 @@ export default function SectionBPart1() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-primary lg:text-xl">
+      <h2 className="mb-3 text-lg font-semibold text-primary lg:text-xl">
         Section B
       </h2>
 
@@ -70,16 +65,18 @@ export default function SectionBPart1() {
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-6">
             <div>
-              <h3 className="my-4 text-lg font-semibold text-black">Spouse</h3>
+              <h3 className="mb-4 text-lg font-semibold text-black">
+                Next of Kin
+              </h3>
 
               <div className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="spouse.surname"
+                  name="nextOfKin.name"
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel className="text-sm">
-                        Surname{"  "}
+                        Name{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
                       <FormControl>
@@ -88,7 +85,7 @@ export default function SectionBPart1() {
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
-                            handleFieldChange("spouse.surname", e.target.value);
+                            handleFieldChange("nextOfKin.name", e.target.value);
                           }}
                         />
                       </FormControl>
@@ -99,7 +96,7 @@ export default function SectionBPart1() {
 
                 <FormField
                   control={form.control}
-                  name="spouse.address"
+                  name="nextOfKin.address"
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel className="text-sm">
@@ -112,7 +109,10 @@ export default function SectionBPart1() {
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
-                            handleFieldChange("spouse.address", e.target.value);
+                            handleFieldChange(
+                              "nextOfKin.address",
+                              e.target.value,
+                            );
                           }}
                         />
                       </FormControl>
@@ -123,7 +123,7 @@ export default function SectionBPart1() {
 
                 <FormField
                   control={form.control}
-                  name="spouse.telephone"
+                  name="nextOfKin.telephone"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm">
@@ -136,7 +136,7 @@ export default function SectionBPart1() {
                           onChange={(e) => {
                             field.onChange(e);
                             handleFieldChange(
-                              "spouse.telephone",
+                              "nextOfKin.telephone",
                               e.target.value,
                             );
                           }}
@@ -149,11 +149,11 @@ export default function SectionBPart1() {
 
                 <FormField
                   control={form.control}
-                  name="spouse.otherNames"
+                  name="nextOfKin.relationship"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm">
-                        Other Names{"  "}
+                        Relationship{"  "}
                         <span className="text-xs text-black">(Required*)</span>
                       </FormLabel>
                       <FormControl>
@@ -162,7 +162,7 @@ export default function SectionBPart1() {
                           onChange={(e) => {
                             field.onChange(e);
                             handleFieldChange(
-                              "spouse.otherNames",
+                              "nextOfKin.relationship",
                               e.target.value,
                             );
                           }}
@@ -175,7 +175,7 @@ export default function SectionBPart1() {
 
                 <FormField
                   control={form.control}
-                  name="spouse.placeOfWork"
+                  name="nextOfKin.placeOfWork"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm">
@@ -188,7 +188,7 @@ export default function SectionBPart1() {
                           onChange={(e) => {
                             field.onChange(e);
                             handleFieldChange(
-                              "spouse.placeOfWork",
+                              "nextOfKin.placeOfWork",
                               e.target.value,
                             );
                           }}
@@ -203,7 +203,7 @@ export default function SectionBPart1() {
           </div>
 
           <div className="mt-5 flex items-center justify-between gap-4">
-            {step > 1 || subStep > 1 ? (
+            {/* {step > 1 || subStep > 1 ? (
               <Button
                 className="w-full"
                 type="button"
@@ -218,9 +218,9 @@ export default function SectionBPart1() {
               </Button>
             ) : (
               <div className="w-full"></div>
-            )}
+            )} */}
 
-            <Button className="w-full" type="submit">
+            <Button className="w-full h-[52px]" type="submit">
               Save & Go to next <ChevronRight />
             </Button>
           </div>

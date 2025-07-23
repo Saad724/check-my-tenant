@@ -82,12 +82,16 @@
 }
 
 .undertaking-title {
-  font-family: Inter;
   font-weight: 800;
   font-style: Bold;
   font-size: 18px;
   line-height: 140%;
   letter-spacing: -2%;
+  color: #222222;
+}
+
+.underline {
+  color: #222222;
 }
 
 /* Guarantor Form Styles */
@@ -99,7 +103,6 @@
 
 /* Radio Label Styles */
 .radio-label {
-  font-family: Inter;
   font-weight: 500;
   font-style: normal;
   font-size: 14px;
@@ -136,7 +139,6 @@
 }
 .guarantor-section-heading {
   color: #222222 !important;
-  font-family: Inter;
   font-weight: 600;
   font-style: Semi Bold;
   font-size: 24px;
@@ -145,7 +147,6 @@
 }
 .guarantor-subheading {
   color: #979696 !important;
-  font-family: Inter;
   font-weight: 500;
   font-style: Medium;
   font-size: 14px;
@@ -154,7 +155,6 @@
 }
 .guarantor-label {
   color: #979696 !important;
-  font-family: Inter;
   font-weight: 500;
   font-style: Medium;
   font-size: 16px;
