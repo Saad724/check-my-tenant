@@ -20,7 +20,7 @@ export default function GuarantorSignIn({
 
         {/* Body Text/Explanation */}
         <p className="mb-8 text-sm leading-relaxed text-gray-600">
-          As a Guarantor, you are responsible for Dwight Schrute's apartment
+          As a Guarantor, you are responsible for Dwight Schrute&apos;s apartment
           rental obligations
         </p>
 

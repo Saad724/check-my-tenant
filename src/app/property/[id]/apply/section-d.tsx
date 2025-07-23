@@ -17,6 +17,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tenant, useApplicationStore } from "@/store/application";
 
 const schema = z.object({
@@ -25,15 +32,20 @@ const schema = z.object({
       name: z.string().min(1, { message: "Name is required" }),
       email: z.string().email({ message: "Valid email is required" }),
       age: z.coerce.number().min(18, { message: "Age must be at least 18" }),
-      telephone: z.string().min(1, { message: "Telephone is required" }),
-      address: z.string().min(1, { message: "Address is required" }),
+      telephone: z
+        .string()
+        .min(11, {
+          message: "Mobile Number is required and should be atleast 11 numbers",
+        })
+        .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
+      address: z.string().min(2, { message: "Address is required" }),
       placeOfWorkAddress: z
         .string()
-        .min(1, { message: "Place of Work Address is required" }),
-      occupation: z.string().min(1, { message: "Occupation is required" }),
+        .min(2, { message: "Place of Work Address is required" }),
+      occupation: z.string().min(2, { message: "Occupation is required" }),
       positionInCompany: z
         .string()
-        .min(1, { message: "Position in Company is required" }),
+        .min(2, { message: "Position in Company is required" }),
       maritalStatus: z
         .string()
         .min(1, { message: "Marital Status is required" }),
@@ -43,11 +55,20 @@ const schema = z.object({
   ),
 });
 
-export default function SectionD() {
+export default function SectionD({
+  landlordId,
+  propertyId,
+}: {
+  landlordId: string;
+  propertyId: string;
+}) {
   const tenant = useApplicationStore((store) => store.tenant);
-  const { goToNextStep, resetStore, setTenant } = useApplicationStore(
-    (store) => store.actions,
-  );
+  const { goToNextStep, goToPrevStep, resetStore, setTenant } =
+    useApplicationStore((store) => store.actions);
+  const handlePrevious = () => {
+    setTenant(form.getValues());
+    goToPrevStep();
+  };
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -73,7 +94,7 @@ export default function SectionD() {
   const mutation = useMutation({
     mutationFn: async (data: Tenant) => {
       await fetch(
-        "http://check-my-tenant.vercel.app/api/tenants/tenant-application",
+        "https://check-my-tenant.vercel.app/api/tenants/tenant-application",
         {
           method: "POST",
           body: JSON.stringify(data),
@@ -92,12 +113,19 @@ export default function SectionD() {
   function onSubmit(values: z.infer<typeof schema>) {
     const vals = { ...tenant, ...values };
     console.log(vals);
-    mutation.mutate({ ...tenant, ...values });
+    mutation.mutate({
+      ...tenant,
+      landlordId,
+      propertyId,
+      ...values,
+    });
   }
 
   return (
-    <div className="my-4 border-t py-2">
-      <h2 className="text-lg font-semibold text-black lg:text-xl">Section D</h2>
+    <div>
+      <h2 className="text-lg font-semibold text-primary lg:text-xl">
+        Section D
+      </h2>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -243,13 +271,12 @@ export default function SectionD() {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name={`guarantors.0.signature`}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Signature</FormLabel>
+                    <FormLabel>Signature (Your Government Name)</FormLabel>
                     <FormControl>
                       <Input className="w-full" {...field} />
                     </FormControl>
@@ -436,13 +463,13 @@ export default function SectionD() {
             </div>
           </div>
 
-          <div className="mt-4 flex items-center justify-between gap-4">
-            <Button className="w-full" type="button" variant="outline">
+          <div className="mt-5 flex items-center justify-between gap-4">
+            <Button className="w-full" type="button" onClick={handlePrevious}>
               <ChevronLeft />
               Section C
             </Button>
 
-            <Button className="w-full" variant="outline" type="submit">
+            <Button className="w-full" type="submit">
               {mutation.isPending ? (
                 <div className="h-4 w-4 animate-spinner rounded-full border-2 border-t-2 border-t-primary ease-linear"></div>
               ) : null}
