@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { MapPin, Pin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/utils";
@@ -77,6 +77,7 @@ export default function Page({
 }: {
   params: { id: string; applicationID: string };
 }) {
+  const router = useRouter();
   const { setTenant } = useApplicationStore((store) => store.actions);
 
   const propertyQuery = useQuery({
@@ -88,6 +89,18 @@ export default function Page({
     queryKey: ["application", params.applicationID],
     queryFn: () => getApplicationById(params.applicationID),
   });
+
+  const applyHandler = async () => {
+    try {
+      await apiRequest(`/api/tenants/application/update-status`, {
+        method: "POST",
+        body: JSON.stringify({ applicationId: params.applicationID, status: 'Viewed' }),
+      });
+      router.push(`/verify-identity/${params.id}/${params.applicationID}`)
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  };
 
   if (propertyQuery.isError) {
     // Show error toast and return error UI
@@ -104,12 +117,19 @@ export default function Page({
   }
 
   if (propertyQuery.data) {
-    if(applicationQuery.data) {
-      localStorage.setItem('guarantorFreeIdentityVerificationExhausted', String(applicationQuery.data.guarantorFreeIdentityVerificationExhausted))
+    if (applicationQuery.data) {
+      localStorage.setItem(
+        "guarantorFreeIdentityVerificationExhausted",
+        String(
+          applicationQuery.data.guarantorFreeIdentityVerificationExhausted,
+        ),
+      );
       setTenant(applicationQuery.data);
-    }
-    else {
-      localStorage.setItem('guarantorFreeIdentityVerificationExhausted', 'false')
+    } else {
+      localStorage.setItem(
+        "guarantorFreeIdentityVerificationExhausted",
+        "false",
+      );
     }
 
     return (
@@ -123,9 +143,14 @@ export default function Page({
           <Button
             asChild
             className="mt-4 w-full items-center justify-center lg:flex lg:w-[500px]"
+            onClick={applyHandler}
           >
             {/* <Link href={`/property/${params.id}/apply`}>Apply</Link> */}
-            <Link href={`/verify-identity/${params.id}`}>Apply</Link>
+            {/* <Link
+              href={`/verify-identity/${params.id}/${params.applicationID}`}
+            > */}
+              <p>Apply</p>
+            {/* </Link> */}
           </Button>
 
           <div className="mt-6">
@@ -242,9 +267,14 @@ export default function Page({
           <Button
             asChild
             className="mt-5 w-full items-center justify-center lg:flex lg:w-[500px]"
+            onClick={applyHandler}
           >
             {/* <Link href={`/property/${params.id}/apply`}>Apply</Link> */}
-            <Link href={`/verify-identity/${params.id}`}>Apply</Link>
+            {/* <Link
+              href={`/verify-identity/${params.id}/${params.applicationID}`}
+            > */}
+              <p>Apply</p>
+            {/* </Link> */}
           </Button>
         </div>
       </main>
