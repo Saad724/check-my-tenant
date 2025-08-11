@@ -1,13 +1,24 @@
 'use client'
-import React, { useState } from "react"
-import { PaystackButton } from "react-paystack"
+import React, { useState, useEffect } from "react"
+import dynamic from "next/dynamic"
 
-const page = () => {
+// Dynamically import PaystackButton to avoid SSR issues
+const PaystackButton = dynamic(() => import("react-paystack").then(mod => ({ default: mod.PaystackButton })), {
+  ssr: false,
+  loading: () => <button className="paystack-button">Loading...</button>
+});
+
+const Page = () => {
   const publicKey = "pk_test_d9b608110f40b3befeb2fa1ff65b2a9b92cd2716";
   const amount = 1000000;
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const componentProps = {
     email,
@@ -15,6 +26,18 @@ const page = () => {
     metadata: {
       name,
       phone,
+      custom_fields: [
+        {
+          display_name: "Name",
+          variable_name: "name",
+          value: name,
+        },
+        {
+          display_name: "Phone",
+          variable_name: "phone",
+          value: phone,
+        },
+      ],
     },
     publicKey,
     text: "Pay Now",
@@ -23,11 +46,15 @@ const page = () => {
     onClose: () => alert("Wait! Don't leave :("),
   };
 
+  if (!isClient) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="App">
       <div className="container">
         <div className="item">
-          <img />
+          <img alt="Product" />
           <div className="item-details">
             <p>Dancing Shoes</p>
             <p>{amount}</p>
@@ -61,4 +88,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
