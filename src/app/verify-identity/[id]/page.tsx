@@ -118,7 +118,7 @@ export default function SectionA({ params }: { params: { id: string } }) {
         body: JSON.stringify({ nin, name, email, phone }),
       });
       setNinStatus({ success: true, message: "NIN verified successfully." });
-      router.push(`/property/${params.id}/apply`);
+      router.push(`/property/${params.id}/${params.id}/apply`);
     } catch (e: any) {
       toast.error(e.message || "NIN verification failed.");
       setNinStatus({
