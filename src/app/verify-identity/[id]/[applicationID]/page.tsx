@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { PaystackButton } from "react-paystack";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -43,11 +44,21 @@ const schema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
 });
 
-export default function SectionA({ params }: { params: { id: string; applicationID: string } }) {
+export default function SectionA({
+  params,
+}: {
+  params: { id: string; applicationID: string };
+}) {
   const router = useRouter();
   const [verifyingNin, setVerifyingNin] = useState(false);
   const [consentCheck, setConsentCheck] = useState(false);
   const { tenant, actions } = useApplicationStore();
+  const [
+    tenantFreeIdentityVerificationExhausted,
+    setTenantFreeIdentityVerificationExhausted,
+  ] = useState<String>(
+    localStorage.getItem("tenantFreeIdentityVerificationExhausted") || "false",
+  );
 
   const handleFieldChange = (name: string, value: any) => {
     actions.setTenant({ [name]: value });
@@ -65,18 +76,65 @@ export default function SectionA({ params }: { params: { id: string; application
 
   async function onSubmit(values: z.infer<typeof schema>) {
     try {
-      setVerifyingNin(true)
-      if (localStorage.getItem('guarantorFreeIdentityVerificationExhausted') === "true") {
-        await payWithPayStack();
-      } else {
+      setVerifyingNin(true);
+      if (tenantFreeIdentityVerificationExhausted === "false") {
         await handleVerifyNIN();
       }
     } catch (e: any) {
-      toast.error(e.message || "Something wen wrong!");
+      toast.error(e.message || "Something went wrong!");
     } finally {
-      setVerifyingNin(false)
+      setVerifyingNin(false);
     }
   }
+
+  const componentProps = {
+    email: form.getValues("email"),
+    amount: 50000,
+    metadata: {
+      name: form.getValues("fullName"),
+      phone: form.getValues("telephone"),
+      custom_fields: [
+        {
+          display_name: "Name",
+          variable_name: "name",
+          value: form.getValues("fullName"),
+        },
+        {
+          display_name: "Phone",
+          variable_name: "phone",
+          value: form.getValues("telephone"),
+        },
+      ],
+    },
+    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
+    onSuccess: async (transaction: any) => {
+      await updateExhaustVerificationState();
+      setTenantFreeIdentityVerificationExhausted("false");
+      console.log(`Payment successful! Reference: ${transaction.reference}`);
+      console.log("Payment successful:", transaction);
+    },
+    onClose: () => {
+      alert("Payment cancelled");
+      console.log("Payment cancelled");
+    },
+    onError: (error: any) => {
+      console.error("Payment error:", error);
+    },
+  };
+
+  const updateExhaustVerificationState = async () => {
+    try {
+      await apiRequest(`/api/tenants/application/${params.applicationID}`, {
+        method: "POST",
+        body: JSON.stringify({
+          tenantFreeIdentityVerificationExhausted: true,
+        }),
+      });
+      localStorage.setItem("tenantFreeIdentityVerificationExhausted", "false");
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  };
 
   const payWithPayStack = async () => {
     try {
@@ -121,6 +179,8 @@ export default function SectionA({ params }: { params: { id: string; application
       router.push(`/property/${params.id}/${params.applicationID}/apply`);
     } catch (e: any) {
       toast.error(e.message || "NIN verification failed.");
+      localStorage.setItem("tenantFreeIdentityVerificationExhausted", "true");
+      setTenantFreeIdentityVerificationExhausted("true");
       setNinStatus({
         success: false,
         message: e.message || "NIN verification failed.",
@@ -249,9 +309,15 @@ export default function SectionA({ params }: { params: { id: string; application
 
               <div className="flex gap-2 pt-[4px]">
                 <div className="mt-[4px]">
-                  <Checkbox checked={consentCheck} onCheckedChange={() => setConsentCheck((prev) => !prev)} />
+                  <Checkbox
+                    checked={consentCheck}
+                    onCheckedChange={() => setConsentCheck((prev) => !prev)}
+                  />
                 </div>
-                <p className="m-0 p-0 text-[#222222] cursor-pointer" onClick={() => setConsentCheck((prev) => !prev)}>
+                <p
+                  className="m-0 cursor-pointer p-0 text-[#222222]"
+                  onClick={() => setConsentCheck((prev) => !prev)}
+                >
                   I consent for a verification process and a record of my
                   interactions with my propestic landlord
                 </p>
@@ -260,13 +326,22 @@ export default function SectionA({ params }: { params: { id: string; application
 
             <hr className="border-[#e7e7e7] pb-[24px]" />
 
-            <Button
-              className="h-[52px] w-full"
-              type="submit"
-              disabled={verifyingNin || !consentCheck}
-            >
-              {verifyingNin ? "Verifying..." : "Confirm"}
-            </Button>
+            {tenantFreeIdentityVerificationExhausted === "true" ? (
+              <PaystackButton
+                {...componentProps}
+                className="inline-flex h-[52px] w-full items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                disabled={verifyingNin || !consentCheck}
+                text={verifyingNin ? "Verifying..." : "Confirm"}
+              />
+            ) : (
+              <Button
+                className="h-[52px] w-full"
+                type="submit"
+                disabled={verifyingNin || !consentCheck}
+              >
+                {verifyingNin ? "Verifying..." : "Confirm"}
+              </Button>
+            )}
           </form>
         </Form>
       </div>

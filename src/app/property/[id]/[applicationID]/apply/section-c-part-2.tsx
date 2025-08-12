@@ -217,8 +217,8 @@ export default function SectionCPart2() {
                             <input
                               type="radio"
                               id="oneMonth"
-                              value="oneMonth"
-                              checked={field.value === "oneMonth"}
+                              value="One month"
+                              checked={field.value === "One month"}
                               onChange={(e) => {
                                 field.onChange(e.target.value);
                                 handleFieldChange(
@@ -239,8 +239,8 @@ export default function SectionCPart2() {
                             <input
                               type="radio"
                               id="threeMonths"
-                              value="threeMonths"
-                              checked={field.value === "threeMonths"}
+                              value="Three month"
+                              checked={field.value === "Three month"}
                               onChange={(e) => {
                                 field.onChange(e.target.value);
                                 handleFieldChange(

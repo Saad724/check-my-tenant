@@ -6,6 +6,7 @@ import { Check, ChevronRight, Upload } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { PaystackButton } from "react-paystack";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -46,7 +47,7 @@ type Step2Data = z.infer<typeof step2Schema>;
 const step3Schema = z.object({
   signature: z.string().min(1, "Signature/Initials is required"),
   date: z.string().min(1, "Date is required"),
-  passportFile: z.any().optional(),
+  passport: z.any().optional(),
 });
 
 type Step3Data = z.infer<typeof step3Schema>;
@@ -73,16 +74,24 @@ type GuarantorData = {
   officeAddress: string;
   signature: string;
   date: string;
-  passportFile: any;
+  passport: any;
   agreement: boolean;
 };
 
 export default function GuarantorForm() {
   const params = useParams();
+  const [
+    guarantorFreeIdentityVerificationExhausted,
+    setGuarantorFreeIdentityVerificationExhausted,
+  ] = useState<String>(
+    localStorage.getItem("guarantorFreeIdentityVerificationExhausted") ||
+      "false",
+  );
   const guarantorID = params.guarantorID;
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadingFile, setUploadingFile] = useState<boolean>(false);
   const [verifyingNIN, setVerifyingNIN] = useState(false);
   const [guarantorData, setGuarantorData] = useState<GuarantorData>({
     nin: "",
@@ -96,7 +105,7 @@ export default function GuarantorForm() {
     officeAddress: "",
     signature: "",
     date: "",
-    passportFile: null,
+    passport: null,
     agreement: false,
   });
 
@@ -125,7 +134,7 @@ export default function GuarantorForm() {
     defaultValues: {
       signature: guarantorData.signature,
       date: guarantorData.date,
-      passportFile: guarantorData.passportFile,
+      passport: guarantorData.passport,
     },
   });
 
@@ -151,6 +160,11 @@ export default function GuarantorForm() {
       setStep(2);
       console.log("Step 1 data:", values);
     } catch (e: any) {
+      localStorage.setItem(
+        "guarantorFreeIdentityVerificationExhausted",
+        "true",
+      );
+      setGuarantorFreeIdentityVerificationExhausted("true");
       toast.error(e.message || "NIN verification failed.");
     } finally {
       setVerifyingNIN(false);
@@ -181,7 +195,12 @@ export default function GuarantorForm() {
   };
 
   async function onSubmitStep1(values: Step1Data) {
-    await handleVerifyNIN(values);
+    if (
+      localStorage.getItem("guarantorFreeIdentityVerificationExhausted") ===
+      "false"
+    ) {
+      await handleVerifyNIN(values);
+    }
   }
 
   function onSubmitStep2(values: Step2Data) {
@@ -211,13 +230,13 @@ export default function GuarantorForm() {
       cityTown: guarantorData.cityTown,
       LGA: guarantorData.lga,
       officeAddress: guarantorData.officeAddress,
-      placeOfWork: "", // Add if available
-      occupation: "", // Add if available
+      placeOfWork: guarantorData.officeAddress, 
+      occupation: "",
       positionInCompany: "", // Add if available
       maritalStatus: "", // Add if available
       signature: guarantorData.signature,
-      date: guarantorData.date,
-      passport: "", // Add if available
+      date: new Date(guarantorData.date),
+      passport: guarantorData.passport, // Add if available
     };
 
     apiRequest(`/api/tenants/update-guarantor?id=${id}`, {
@@ -333,19 +352,62 @@ export default function GuarantorForm() {
             />
 
             <div className="pt-4">
-              <Button
-                type="submit"
-                className="guarantor-primary h-[52px] w-full"
-                disabled={verifyingNIN}
-              >
-                {verifyingNIN ? (
-                  "Verifying..."
-                ) : (
-                  <>
-                    Save & go to next <ChevronRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
+              {guarantorFreeIdentityVerificationExhausted === "true" ? (
+                <PaystackButton
+                  email={form.getValues("email")}
+                  amount={50000}
+                  metadata={{
+                    name: form.getValues("fullName"),
+                    phone: form.getValues("telephone"),
+                    custom_fields: [
+                      {
+                        display_name: "Name",
+                        variable_name: "name",
+                        value: form.getValues("fullName"),
+                      },
+                      {
+                        display_name: "Phone",
+                        variable_name: "phone",
+                        value: form.getValues("telephone"),
+                      },
+                    ],
+                  }}
+                  publicKey={process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || ""}
+                  onSuccess={async (transaction: any) => {
+                    setGuarantorFreeIdentityVerificationExhausted("false");
+                    localStorage.setItem(
+                      "guarantorFreeIdentityVerificationExhausted",
+                      "false",
+                    );
+                    console.log(
+                      `Payment successful! Reference: ${transaction.reference}`,
+                    );
+                    console.log("Payment successful:", transaction);
+                  }}
+                  onClose={() => {
+                    alert("Payment cancelled");
+                    console.log("Payment cancelled");
+                  }}
+                  className="inline-flex h-[52px] w-full items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                  disabled={verifyingNIN}
+                  text={verifyingNIN ? "Verifying..." : "Save & go to next"}
+                />
+              ) : (
+                <Button
+                  type="submit"
+                  className="guarantor-primary h-[52px] w-full"
+                  disabled={verifyingNIN}
+                >
+                  {verifyingNIN ? (
+                    "Verifying..."
+                  ) : (
+                    <>
+                      Save & go to next{" "}
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </form>
         </Form>
@@ -446,38 +508,42 @@ export default function GuarantorForm() {
   function Step3Form({
     form,
     onSubmit,
+    uploadingFile,
+    setUploadingFile,
   }: {
     form: any;
     onSubmit: (values: Step3Data) => void;
+    uploadingFile: boolean;
+    setUploadingFile: (value: boolean) => void;
   }) {
-    const [uploadingFIle, setUploadingFile] = useState<boolean>(false);
     const handleFileChange = async (
       event: React.ChangeEvent<HTMLInputElement>,
     ) => {
       const file = event.target.files?.[0];
       if (file) {
         setSelectedFile(file);
-        const passport = await uploadPassport(file);
-        form.setValue("passport", passport);
+        setUploadingFile(true);
+        try {
+          const passport = await uploadPassport(file);
+          form.setValue("passport", passport);
+        } catch (error) {
+          console.error("Error uploading passport:", error);
+          toast.error("Failed to upload passport. Please try again.");
+        } finally {
+          setUploadingFile(false);
+        }
       }
     };
 
     const uploadPassport = async (file: any) => {
-      try {
-        setUploadingFile(true);
-        const base64Image = await fileToBase64(file);
+      const base64Image = await fileToBase64(file);
 
-        const res = await apiRequest("/api/upload", {
-          method: "POST",
-          body: JSON.stringify({ base64Image }),
-        });
+      const res = await apiRequest("/api/upload", {
+        method: "POST",
+        body: JSON.stringify({ base64Image }),
+      });
 
-        return res?.url;
-      } catch (error: any) {
-        throw new Error(error);
-      } finally {
-        setUploadingFile(false);
-      }
+      return res?.url;
     };
 
     const fileToBase64 = (file: File): Promise<string> => {
@@ -541,14 +607,19 @@ export default function GuarantorForm() {
                   className="hidden"
                   accept=".jpg,.jpeg,.png,.gif"
                   onChange={handleFileChange}
+                  disabled={uploadingFile}
                 />
-                <label htmlFor="passport-upload" className="cursor-pointer">
+                <label htmlFor="passport-upload" className={`cursor-pointer ${uploadingFile ? 'pointer-events-none opacity-50' : ''}`}>
                   <div className="flex flex-col items-center space-y-2">
                     <div className="rounded-lg bg-teal-100 p-3">
-                      <Upload className="h-6 w-6 text-teal-600" />
+                      {uploadingFile ? (
+                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-teal-600 border-t-transparent"></div>
+                      ) : (
+                        <Upload className="h-6 w-6 text-teal-600" />
+                      )}
                     </div>
                     <span className="font-medium text-black underline">
-                      Upload passport
+                      {uploadingFile ? "Uploading..." : "Upload passport"}
                     </span>
                     <span className="text-sm text-gray-500">
                       JPG, PNG or GIF - Max file size 2MB
@@ -567,9 +638,9 @@ export default function GuarantorForm() {
               <Button
                 type="submit"
                 className="guarantor-primary h-[52px] w-full"
-                disabled={uploadingFIle}
+                disabled={uploadingFile}
               >
-                {uploadingFIle ? (
+                {uploadingFile ? (
                   "Uploading..."
                 ) : (
                   <>
@@ -602,8 +673,14 @@ export default function GuarantorForm() {
         <div className="mb-6">
           <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-200">
             <span className="px-2 text-center text-xs text-gray-500">
-              (whose photograph appeared above and attached means of
-              identification)
+              {guarantorData?.passport ? (
+                <img src={guarantorData?.passport} />
+              ) : (
+                <p>
+                  (whose photograph appeared above and attached means of
+                  identification)
+                </p>
+              )}
             </span>
           </div>
         </div>
@@ -750,7 +827,7 @@ export default function GuarantorForm() {
       case 2:
         return <Step2Form form={form2} onSubmit={onSubmitStep2} />;
       case 3:
-        return <Step3Form form={form3} onSubmit={onSubmitStep3} />;
+        return <Step3Form form={form3} onSubmit={onSubmitStep3} uploadingFile={uploadingFile} setUploadingFile={setUploadingFile} />;
       case 4:
         return (
           <Step4Form
@@ -774,8 +851,8 @@ export default function GuarantorForm() {
           application
         </h1>
         <p className="guarantor-subheading mt-4">
-          As a Guarantor, you are responsible for Dwight Schrute&apos;s apartment
-          rental obligations
+          As a Guarantor, you are responsible for Dwight Schrute&apos;s
+          apartment rental obligations
         </p>
       </div>
 
