@@ -119,15 +119,15 @@ export default function Page({
   if (propertyQuery.data) {
     if (applicationQuery.data) {
       localStorage.setItem(
-        "guarantorFreeIdentityVerificationExhausted",
+        "tenantFreeIdentityVerificationExhausted",
         String(
-          applicationQuery.data.guarantorFreeIdentityVerificationExhausted,
+          applicationQuery.data.tenantFreeIdentityVerificationExhausted,
         ),
       );
       setTenant(applicationQuery.data);
     } else {
       localStorage.setItem(
-        "guarantorFreeIdentityVerificationExhausted",
+        "tenantFreeIdentityVerificationExhausted",
         "false",
       );
     }
@@ -142,7 +142,7 @@ export default function Page({
 
           <Button
             asChild
-            className="mt-4 w-full items-center justify-center lg:flex lg:w-[500px]"
+            className="mt-4 w-full items-center justify-center lg:flex lg:w-[500px] cursor-pointer"
             onClick={applyHandler}
           >
             {/* <Link href={`/property/${params.id}/apply`}>Apply</Link> */}
@@ -266,7 +266,7 @@ export default function Page({
 
           <Button
             asChild
-            className="mt-5 w-full items-center justify-center lg:flex lg:w-[500px]"
+            className="mt-5 w-full items-center justify-center lg:flex lg:w-[500px] cursor-pointer"
             onClick={applyHandler}
           >
             {/* <Link href={`/property/${params.id}/apply`}>Apply</Link> */}
