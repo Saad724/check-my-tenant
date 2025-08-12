@@ -27,7 +27,12 @@ const step1Schema = z.object({
   nin: z.string().min(1, { message: "NIN is required" }),
   fullName: z.string().min(1, "Full name is required"),
   email: z.string().email("Please enter a valid email address"),
-  phoneNumber: z.string().min(1, "Phone number is required"),
+  phoneNumber: z
+    .string()
+    .min(11, {
+      message: "Mobile Number is required and should be atleast 11 numbers",
+    })
+    .max(11, { message: "Mobile Number cannot be more than 11 numbers" }),
   homeAddress: z.string().min(1, "Home address is required"),
 });
 
@@ -230,7 +235,7 @@ export default function GuarantorForm() {
       cityTown: guarantorData.cityTown,
       LGA: guarantorData.lga,
       officeAddress: guarantorData.officeAddress,
-      placeOfWork: guarantorData.officeAddress, 
+      placeOfWork: guarantorData.officeAddress,
       occupation: "",
       positionInCompany: "", // Add if available
       maritalStatus: "", // Add if available
@@ -609,7 +614,10 @@ export default function GuarantorForm() {
                   onChange={handleFileChange}
                   disabled={uploadingFile}
                 />
-                <label htmlFor="passport-upload" className={`cursor-pointer ${uploadingFile ? 'pointer-events-none opacity-50' : ''}`}>
+                <label
+                  htmlFor="passport-upload"
+                  className={`cursor-pointer ${uploadingFile ? "pointer-events-none opacity-50" : ""}`}
+                >
                   <div className="flex flex-col items-center space-y-2">
                     <div className="rounded-lg bg-teal-100 p-3">
                       {uploadingFile ? (
@@ -827,7 +835,14 @@ export default function GuarantorForm() {
       case 2:
         return <Step2Form form={form2} onSubmit={onSubmitStep2} />;
       case 3:
-        return <Step3Form form={form3} onSubmit={onSubmitStep3} uploadingFile={uploadingFile} setUploadingFile={setUploadingFile} />;
+        return (
+          <Step3Form
+            form={form3}
+            onSubmit={onSubmitStep3}
+            uploadingFile={uploadingFile}
+            setUploadingFile={setUploadingFile}
+          />
+        );
       case 4:
         return (
           <Step4Form
