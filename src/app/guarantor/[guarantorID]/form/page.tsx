@@ -148,14 +148,14 @@ export default function GuarantorForm() {
   async function handleVerifyNIN(values: any) {
     try {
       setVerifyingNIN(true);
-      // const nin = values.nin;
-      // const name = values.fullName;
-      // const email = values.email;
-      // const phone = values.phoneNumber;
-      // await apiRequest("/api/accounts/verify-guest-identity", {
-      //   method: "POST",
-      //   body: JSON.stringify({ nin, name, email, phone }),
-      // });
+      const nin = values.nin;
+      const name = values.fullName;
+      const email = values.email;
+      const phone = values.phoneNumber;
+      await apiRequest("/api/accounts/verify-guest-identity", {
+        method: "POST",
+        body: JSON.stringify({ nin, name, email, phone }),
+      });
       setGuarantorData((prev) => ({ ...prev, ...values }));
       setStep(2);
       console.log("Step 1 data:", values);
